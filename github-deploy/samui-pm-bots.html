@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samui PM · Bot Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0f0a;--bg2:#0f1a0f;--bg3:#131f13;--bg4:#1a2a1a;
+  --green:#2d6a2d;--green-light:#3d8a3d;--green-bright:#4caf50;
+  --gold:#c9a84c;--sand:#f2e8d5;--muted:#6b8f6b;--muted2:#4a6b4a;
+  --text:#e8f0e8;--border:rgba(76,175,80,0.12);--radius:14px;
+  --coral:#d4634a;--teal:#1a9090;
+  --tg:#2AABEE;--line:#06C755;--fb:#1877F2;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100%;}
+body{padding-bottom:60px;}
+
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sand);}
+.logo span{color:var(--gold);}
+.header-badge{font-size:11px;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.2);color:var(--green-bright);padding:3px 10px;border-radius:10px;font-weight:500;}
+
+.hero{padding:36px 24px 28px;max-width:860px;margin:0 auto;}
+.hero h1{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--sand);margin-bottom:8px;}
+.hero p{font-size:14px;color:var(--muted);line-height:1.65;max-width:600px;}
+
+/* PLATFORM TABS */
+.plat-tabs{display:flex;gap:8px;padding:0 24px;max-width:860px;margin:0 auto 28px;flex-wrap:wrap;}
+.ptab{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.ptab.tg{color:var(--tg);border-color:rgba(42,171,238,0.25);}
+.ptab.tg.active{background:rgba(42,171,238,0.12);border-color:rgba(42,171,238,0.4);}
+.ptab.line{color:var(--line);border-color:rgba(6,199,85,0.25);}
+.ptab.line.active{background:rgba(6,199,85,0.1);border-color:rgba(6,199,85,0.4);}
+.ptab.fb{color:var(--fb);border-color:rgba(24,119,242,0.25);}
+.ptab.fb.active{background:rgba(24,119,242,0.1);border-color:rgba(24,119,242,0.4);}
+.ptab.all{color:var(--gold);border-color:rgba(201,168,76,0.25);}
+.ptab.all.active{background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.4);}
+
+/* MAIN CONTENT */
+.main{max-width:860px;margin:0 auto;padding:0 24px;}
+.plat-section{display:none;}
+.plat-section.active{display:block;}
+
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding:18px 22px;border-radius:var(--radius);border:1px solid var(--border);}
+.sec-header.tg{background:rgba(42,171,238,0.07);border-color:rgba(42,171,238,0.2);}
+.sec-header.line{background:rgba(6,199,85,0.07);border-color:rgba(6,199,85,0.2);}
+.sec-header.fb{background:rgba(24,119,242,0.07);border-color:rgba(24,119,242,0.2);}
+.sec-icon{font-size:32px;}
+.sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--sand);}
+.sec-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.difficulty{margin-left:auto;font-size:11px;font-weight:600;padding:4px 12px;border-radius:8px;}
+.diff-easy{background:rgba(76,175,80,0.15);color:var(--green-bright);border:1px solid rgba(76,175,80,0.25);}
+.diff-med{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.25);}
+.diff-hard{background:rgba(212,99,74,0.15);color:var(--coral);border:1px solid rgba(212,99,74,0.25);}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:28px;}
+.step{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.step-header{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.sn-tg{background:rgba(42,171,238,0.15);color:var(--tg);}
+.sn-line{background:rgba(6,199,85,0.15);color:var(--line);}
+.sn-fb{background:rgba(24,119,242,0.15);color:var(--fb);}
+.step-title{font-size:14px;font-weight:600;color:var(--text);flex:1;}
+.step-toggle{font-size:12px;color:var(--muted);}
+.step-body{padding:0 18px 16px;display:none;}
+.step-body.open{display:block;}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px;}
+
+/* CODE BLOCKS */
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#a8d8a8;line-height:1.7;position:relative;overflow-x:auto;margin:10px 0;}
+.code-block .comment{color:var(--muted2);}
+.code-block .keyword{color:#f9a825;}
+.code-block .string{color:#80cbc4;}
+.code-block .var{color:#ce93d8;}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.25);border-radius:6px;padding:4px 10px;font-size:10.5px;color:var(--green-bright);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;}
+.copy-btn:hover{background:rgba(76,175,80,0.25);}
+.copy-btn.copied{background:rgba(76,175,80,0.3);color:#fff;}
+
+/* BOT FLOW */
+.flow-title{font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:500;margin:16px 0 10px;}
+.flow{display:flex;flex-direction:column;gap:6px;}
+.flow-item{display:flex;gap:10px;align-items:flex-start;}
+.fi-who{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:6px;flex-shrink:0;min-width:56px;text-align:center;margin-top:2px;}
+.fi-client{background:rgba(255,255,255,0.06);color:var(--muted);}
+.fi-bot{background:rgba(76,175,80,0.12);color:var(--green-bright);}
+.fi-msg{font-size:13px;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;line-height:1.5;flex:1;}
+
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.ic-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);font-weight:500;margin-bottom:6px;}
+.ic-val{font-size:14px;font-weight:500;color:var(--text);}
+.ic-sub{font-size:12px;color:var(--muted2);margin-top:3px;}
+
+/* WEBHOOK SETUP */
+.webhook-box{background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.wb-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.wb-url{font-family:'JetBrains Mono',monospace;font-size:12px;color:#80cbc4;background:var(--bg);padding:8px 12px;border-radius:7px;border:1px solid var(--border);margin-top:6px;word-break:break-all;}
+
+/* DEPLOY CARD */
+.deploy-card{background:linear-gradient(135deg,var(--bg2),rgba(76,175,80,0.05));border:1px solid rgba(76,175,80,0.25);border-radius:var(--radius);padding:22px 24px;margin-top:24px;}
+.dc-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sand);margin-bottom:8px;}
+.dc-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.55;}
+.dc-steps{display:flex;flex-direction:column;gap:8px;}
+.dcs{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text);}
+.dcs-num{width:22px;height:22px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;}
+
+/* ALL SECTION */
+.all-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;}
+.all-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;}
+.all-card.tg{border-color:rgba(42,171,238,0.2);}
+.all-card.line{border-color:rgba(6,199,85,0.2);}
+.all-card.fb{border-color:rgba(24,119,242,0.2);}
+.ac-icon{font-size:28px;margin-bottom:8px;}
+.ac-name{font-size:14px;font-weight:600;color:var(--sand);margin-bottom:4px;}
+.ac-status{font-size:11px;padding:2px 8px;border-radius:8px;display:inline-block;}
+.acs-easy{background:rgba(76,175,80,0.12);color:var(--green-bright);}
+.acs-med{background:rgba(201,168,76,0.12);color:var(--gold);}
+.acs-hard{background:rgba(212,99,74,0.12);color:var(--coral);}
+.ac-feature{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5;}
+
+.summary-flow{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:24px;}
+.sf-title{font-size:13px;font-weight:600;color:var(--sand);margin-bottom:14px;}
+.sf-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+.sf-arrow{color:var(--muted2);font-size:16px;}
+.sf-box{padding:5px 12px;border-radius:7px;font-weight:500;font-size:12px;}
+.sf-client{background:rgba(255,255,255,0.05);color:var(--muted);}
+.sf-bot{background:rgba(76,175,80,0.1);color:var(--green-bright);}
+.sf-crm{background:rgba(201,168,76,0.1);color:var(--gold);}
+.sf-task{background:rgba(26,144,144,0.1);color:#5fc7c7;}
+
+@media(max-width:600px){
+  .cards-grid{grid-template-columns:1fr;}
+  .all-grid{grid-template-columns:1fr;}
+  .main{padding:0 14px;}
+  .hero{padding:24px 16px 20px;}
+  .plat-tabs{padding:0 14px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span class="logo">Samui <span>PM</span></span>
+    <span style="font-size:11px;color:var(--muted);margin-left:6px;font-family:'Outfit',sans-serif;">· Bot Setup</span>
+  </div>
+  <span class="header-badge">🤖 Auto-Reply System</span>
+</header>
+
+<div class="hero">
+  <h1>Auto-Reply Bot System</h1>
+  <p>Complete setup guide for Telegram, Line, and Facebook Messenger bots. Each bot automatically replies to inquiries, collects client details, books viewings, and syncs with your Samui PM Hub.</p>
+</div>
+
+<div class="plat-tabs">
+  <div class="ptab all active" onclick="showPlat('all',this)">🌐 Overview</div>
+  <div class="ptab tg" onclick="showPlat('tg',this)">✈️ Telegram</div>
+  <div class="ptab line" onclick="showPlat('line',this)">💬 Line</div>
+  <div class="ptab fb" onclick="showPlat('fb',this)">👤 Facebook</div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="plat-section active" id="sec-all">
+
+  <div class="all-grid">
+    <div class="all-card tg">
+      <div class="ac-icon">✈️</div>
+      <div class="ac-name">Telegram</div>
+      <span class="ac-status acs-easy">Easiest · Start here</span>
+      <div class="ac-feature">Free bot API. No approval. Works in 10 minutes. Best for Russian & European clients.</div>
+    </div>
+    <div class="all-card line">
+      <div class="ac-icon">💬</div>
+      <div class="ac-name">Line</div>
+      <span class="ac-status acs-med">Medium · 30 min</span>
+      <div class="ac-feature">Line Official Account required. Free tier: 500 messages/month. Best for Thai clients.</div>
+    </div>
+    <div class="all-card fb">
+      <div class="ac-icon">👤</div>
+      <div class="ac-name">Facebook Messenger</div>
+      <span class="ac-status acs-hard">Needs approval · 1-2 days</span>
+      <div class="ac-feature">Requires Facebook App + Page. Meta review needed. Best for international expats.</div>
+    </div>
+  </div>
+
+  <div class="summary-flow">
+    <div class="sf-title">🔄 How the bot system works — all platforms</div>
+    <div class="sf-row"><span class="sf-box sf-client">Client messages</span><span class="sf-arrow">→</span><span class="sf-box sf-bot">Bot auto-replies in Thai/EN/RU</span></div>
+    <div class="sf-row"><span class="sf-box sf-bot">Bot asks questions</span><span class="sf-arrow">→</span><span class="sf-box sf-client">Client answers (name, budget, dates)</span></div>
+    <div class="sf-row"><span class="sf-box sf-client">Client picks property</span><span class="sf-arrow">→</span><span class="sf-box sf-bot">Bot books viewing slot</span></div>
+    <div class="sf-row"><span class="sf-box sf-bot">Bot sends confirmation</span><span class="sf-arrow">→</span><span class="sf-box sf-crm">Auto-saved to CRM</span><span class="sf-arrow">→</span><span class="sf-box sf-task">Task created for you</span></div>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:20px 22px;margin-bottom:24px;">
+    <div style="font-size:14px;font-weight:600;color:var(--gold);margin-bottom:12px;">📋 Setup Order (recommended)</div>
+    <div class="dcs" style="margin-bottom:10px;"><div class="dcs-num">1</div><div><strong style="color:var(--sand);">Start with Telegram</strong> — fastest, no approval, you can test immediately with your Russian clients</div></div>
+    <div class="dcs" style="margin-bottom:10px;"><div class="dcs-num">2</div><div><strong style="color:var(--sand);">Then Line</strong> — create Official Account, connect webhook to your Cloudflare Worker</div></div>
+    <div class="dcs"><div class="dcs-num">3</div><div><strong style="color:var(--sand);">Finally Facebook</strong> — set up Facebook Page, create App, submit for review</div></div>
+  </div>
+
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+    <div style="font-size:13px;font-weight:600;color:var(--sand);margin-bottom:10px;">🏗️ What runs the bots</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7;">
+      All 3 bots run on a single <strong style="color:var(--text);">Cloudflare Worker</strong> — the same one already on your <strong style="color:var(--gold);">ch-howtoniksen.com</strong> account. 
+      It receives messages from all platforms, processes them with Claude AI, and sends replies back automatically.
+      <br><br>
+      Your worker URL: <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#80cbc4;background:var(--bg);padding:2px 8px;border-radius:4px;">https://ch-howtoniksen.com/bot</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TELEGRAM ═══════════════ -->
+<div class="plat-section" id="sec-tg">
+  <div class="sec-header tg">
+    <div class="sec-icon">✈️</div>
+    <div>
+      <div class="sec-title">Telegram Bot</div>
+      <div class="sec-sub">Free · No approval needed · 10 minutes setup</div>
+    </div>
+    <span class="difficulty diff-easy">Easiest</span>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-tg">1</div>
+        <div class="step-title">Create your bot with BotFather</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body open">
+        <div class="step-desc">Open Telegram and search for <strong>@BotFather</strong> — this is Telegram's official bot creator.</div>
+        <div class="flow">
+          <div class="flow-item"><span class="fi-who fi-client">You</span><span class="fi-msg">/newbot</span></div>
+          <div class="flow-item"><span class="fi-who fi-bot">BotFather</span><span class="fi-msg">Alright, a new bot. How are we going to call it? Please choose a name for your bot.</span></div>
+          <div class="flow-item"><span class="fi-who fi-client">You</span><span class="fi-msg">Samui PM Properties</span></div>
+          <div class="flow-item"><span class="fi-who fi-bot">BotFather</span><span class="fi-msg">Good. Now let's choose a username for your bot. It must end in `bot`. Like this, for example: TetrisBot or tetris_bot.</span></div>
+          <div class="flow-item"><span class="fi-who fi-client">You</span><span class="fi-msg">SamuiPMBot</span></div>
+          <div class="flow-item"><span class="fi-who fi-bot">BotFather</span><span class="fi-msg">Done! Congratulations on your new bot. You will find it at t.me/SamuiPMBot.<br><br>Use this token to access the HTTP API:<br><strong>7123456789:AAHdqTcvCH1vGWJxfSeofSEs4eJAb29kcmU</strong><br><br>Keep your token secure!</span></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12.5px;color:var(--gold);">
+          ⚠️ <strong>Save that token!</strong> You'll need it in step 3. Keep it secret — anyone with this token controls your bot.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-tg">2</div>
+        <div class="step-title">Set up your Cloudflare Worker (the bot brain)</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">Go to <strong>dash.cloudflare.com</strong> → Workers & Pages → Create application → Worker → Create Worker. Name it <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11px;">samui-pm-bot</code>. Then paste this code:</div>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="comment">// Samui PM · Telegram Bot Worker</span>
+<span class="comment">// Deploy to: dash.cloudflare.com → Workers</span>
+
+<span class="keyword">const</span> <span class="var">BOT_TOKEN</span> = <span class="string">'YOUR_BOT_TOKEN_HERE'</span>;
+<span class="keyword">const</span> <span class="var">CLAUDE_API_KEY</span> = <span class="string">'YOUR_CLAUDE_API_KEY'</span>;
+
+<span class="keyword">const</span> <span class="var">SYSTEM_PROMPT</span> = <span class="string">`You are a friendly property management assistant for Samui PM on Koh Samui, Thailand.
+
+You help clients find rental properties and villas. Available properties:
+- Sea View Villa, Lamai: 3 bed/2 bath, pool, ฿120,000/mo
+- Mae Nam Beach House: 2 bed/2 bath, beachfront, ฿45,000/mo  
+- Chaweng Hilltop Villa: 4 bed/3 bath, infinity pool, ฿180,000/mo
+- Bophut Pool Villa: 3 bed/2 bath, pool, ฿85,000/mo
+- Chaweng Noi Mountain View House: 1 bed/1 bath, ฿15,000/mo long-term
+
+Your tasks:
+1. Greet client warmly
+2. Ask: name, nationality, budget, dates, number of people, preferences
+3. Suggest matching properties
+4. Offer to book a viewing
+5. Collect: preferred viewing date/time
+6. Confirm appointment and say manager Sujitta will contact them
+
+Reply in the same language as the client (Thai/English/Russian).
+Be warm, professional, concise. Max 3-4 sentences per reply.`</span>;
+
+<span class="keyword">export default</span> {
+  <span class="keyword">async</span> fetch(request) {
+    <span class="keyword">if</span> (request.method !== <span class="string">'POST'</span>) 
+      <span class="keyword">return new</span> Response(<span class="string">'OK'</span>);
+    
+    <span class="keyword">const</span> body = <span class="keyword">await</span> request.json();
+    <span class="keyword">const</span> msg = body?.message;
+    <span class="keyword">if</span> (!msg?.text) <span class="keyword">return new</span> Response(<span class="string">'OK'</span>);
+    
+    <span class="keyword">const</span> chatId = msg.chat.id;
+    <span class="keyword">const</span> text = msg.text;
+    <span class="keyword">const</span> name = msg.from?.first_name || <span class="string">'there'</span>;
+    
+    <span class="comment">// Get AI reply from Claude</span>
+    <span class="keyword">const</span> aiReply = <span class="keyword">await</span> getClaudeReply(text, name);
+    
+    <span class="comment">// Send reply to Telegram</span>
+    <span class="keyword">await</span> sendTelegram(chatId, aiReply);
+    
+    <span class="keyword">return new</span> Response(<span class="string">'OK'</span>);
+  }
+};
+
+<span class="keyword">async function</span> getClaudeReply(userMsg, clientName) {
+  <span class="keyword">const</span> res = <span class="keyword">await</span> fetch(<span class="string">'https://api.anthropic.com/v1/messages'</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+      <span class="string">'x-api-key'</span>: CLAUDE_API_KEY,
+      <span class="string">'anthropic-version'</span>: <span class="string">'2023-06-01'</span>
+    },
+    body: JSON.stringify({
+      model: <span class="string">'claude-haiku-4-5-20251001'</span>,
+      max_tokens: <span class="var">300</span>,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: <span class="string">'user'</span>, content: userMsg }]
+    })
+  });
+  <span class="keyword">const</span> data = <span class="keyword">await</span> res.json();
+  <span class="keyword">return</span> data.content?.[<span class="var">0</span>]?.text || <span class="string">'Hello! How can I help you find a property on Koh Samui?'</span>;
+}
+
+<span class="keyword">async function</span> sendTelegram(chatId, text) {
+  <span class="keyword">await</span> fetch(<span class="string">`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: <span class="string">'HTML'</span> })
+  });
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-tg">3</div>
+        <div class="step-title">Add your tokens & deploy</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">In the Worker code, replace these two values:</div>
+        <div class="code-block">
+<span class="keyword">const</span> <span class="var">BOT_TOKEN</span> = <span class="string">'7123456789:AAHdqTcvCH1vGWJxfSeofSEs4eJAb29kcmU'</span>;  <span class="comment">← from BotFather</span>
+<span class="keyword">const</span> <span class="var">CLAUDE_API_KEY</span> = <span class="string">'sk-ant-api03-...'</span>;  <span class="comment">← from console.anthropic.com → API Keys</span>
+        </div>
+        <div style="margin-top:10px;font-size:13px;color:var(--muted);">Then click <strong style="color:var(--sand);">Save and Deploy</strong> in the Cloudflare editor.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-tg">4</div>
+        <div class="step-title">Connect bot to your Worker (set webhook)</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">Open this URL in your browser (replace with your token and Worker URL):</div>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+https://api.telegram.org/bot<span class="var">YOUR_BOT_TOKEN</span>/setWebhook?url=https://samui-pm-bot.<span class="var">YOUR_ACCOUNT</span>.workers.dev
+        </div>
+        <div style="margin-top:10px;font-size:13px;color:var(--muted);">You should see: <span style="color:var(--green-bright);">{"ok":true,"result":true,"description":"Webhook was set"}</span></div>
+        <div style="margin-top:10px;padding:10px 14px;background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.2);border-radius:8px;font-size:12.5px;color:var(--green-bright);">
+          ✅ Done! Test it — message your bot at <strong>t.me/SamuiPMBot</strong> — it will reply automatically!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px;">
+    <div class="flow-title">🤖 How the bot converses with clients</div>
+    <div class="flow">
+      <div class="flow-item"><span class="fi-who fi-client">Client</span><span class="fi-msg">Hello, I'm looking for a villa to rent</span></div>
+      <div class="flow-item"><span class="fi-who fi-bot">Bot</span><span class="fi-msg">Hello! Welcome to Samui PM 🌴 I'd love to help you find the perfect villa. May I ask your name and roughly what budget you have in mind per month?</span></div>
+      <div class="flow-item"><span class="fi-who fi-client">Client</span><span class="fi-msg">I'm Sergei, budget around 100,000 baht</span></div>
+      <div class="flow-item"><span class="fi-who fi-bot">Bot</span><span class="fi-msg">Hi Sergei! For ฿100,000/month I have two excellent options — Sea View Villa in Lamai (3 bed, private pool, ฿120k, negotiable) or Bophut Pool Villa (3 bed, near Fisherman's Village, ฿85k). Which area do you prefer?</span></div>
+      <div class="flow-item"><span class="fi-who fi-client">Client</span><span class="fi-msg">Sea view sounds great</span></div>
+      <div class="flow-item"><span class="fi-who fi-bot">Bot</span><span class="fi-msg">Excellent choice! 🏖️ When would you like to arrange a viewing? I can suggest this week or early next week. Our manager Sujitta will personally show you the property.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LINE ═══════════════ -->
+<div class="plat-section" id="sec-line">
+  <div class="sec-header line">
+    <div class="sec-icon">💬</div>
+    <div>
+      <div class="sec-title">Line Official Account Bot</div>
+      <div class="sec-sub">Line Messaging API · Free 500 messages/month · ~30 min setup</div>
+    </div>
+    <span class="difficulty diff-med">Medium</span>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-line">1</div>
+        <div class="step-title">Create Line Official Account</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body open">
+        <div class="step-desc">Go to <strong>account.line.biz</strong> and create a free Official Account for your business.</div>
+        <div class="dc-steps">
+          <div class="dcs"><div class="dcs-num">1</div><div>Go to <strong style="color:var(--sand);">account.line.biz</strong> → Create Account</div></div>
+          <div class="dcs"><div class="dcs-num">2</div><div>Account name: <strong style="color:var(--sand);">Samui PM Properties</strong></div></div>
+          <div class="dcs"><div class="dcs-num">3</div><div>Category: <strong style="color:var(--sand);">Real Estate</strong></div></div>
+          <div class="dcs"><div class="dcs-num">4</div><div>Go to <strong style="color:var(--sand);">Settings → Messaging API → Enable</strong></div></div>
+          <div class="dcs"><div class="dcs-num">5</div><div>Create a <strong style="color:var(--sand);">Channel Access Token</strong> — save it!</div></div>
+          <div class="dcs"><div class="dcs-num">6</div><div>Note your <strong style="color:var(--sand);">Channel Secret</strong> — save it too!</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-line">2</div>
+        <div class="step-title">Deploy Line Bot Worker code</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">Create a new Cloudflare Worker called <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:11px;">samui-line-bot</code> with this code:</div>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">const</span> <span class="var">LINE_TOKEN</span> = <span class="string">'YOUR_LINE_CHANNEL_ACCESS_TOKEN'</span>;
+<span class="keyword">const</span> <span class="var">CLAUDE_API_KEY</span> = <span class="string">'YOUR_CLAUDE_API_KEY'</span>;
+
+<span class="keyword">export default</span> {
+  <span class="keyword">async</span> fetch(request) {
+    <span class="keyword">if</span> (request.method !== <span class="string">'POST'</span>) <span class="keyword">return new</span> Response(<span class="string">'OK'</span>);
+    
+    <span class="keyword">const</span> body = <span class="keyword">await</span> request.json();
+    <span class="keyword">const</span> events = body.events || [];
+    
+    <span class="keyword">for</span> (<span class="keyword">const</span> event <span class="keyword">of</span> events) {
+      <span class="keyword">if</span> (event.type !== <span class="string">'message'</span>) <span class="keyword">continue</span>;
+      <span class="keyword">const</span> replyToken = event.replyToken;
+      <span class="keyword">const</span> text = event.message?.text;
+      <span class="keyword">if</span> (!text) <span class="keyword">continue</span>;
+      
+      <span class="keyword">const</span> aiReply = <span class="keyword">await</span> getClaudeReply(text);
+      <span class="keyword">await</span> replyLine(replyToken, aiReply);
+    }
+    <span class="keyword">return new</span> Response(<span class="string">'OK'</span>);
+  }
+};
+
+<span class="keyword">async function</span> getClaudeReply(msg) {
+  <span class="keyword">const</span> res = <span class="keyword">await</span> fetch(<span class="string">'https://api.anthropic.com/v1/messages'</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+      <span class="string">'x-api-key'</span>: CLAUDE_API_KEY,
+      <span class="string">'anthropic-version'</span>: <span class="string">'2023-06-01'</span>
+    },
+    body: JSON.stringify({
+      model: <span class="string">'claude-haiku-4-5-20251001'</span>,
+      max_tokens: <span class="var">300</span>,
+      system: <span class="string">'You are a property assistant for Samui PM on Koh Samui. Help clients find villas and houses. Reply in Thai or English based on the client. Be warm and concise.'</span>,
+      messages: [{ role: <span class="string">'user'</span>, content: msg }]
+    })
+  });
+  <span class="keyword">const</span> data = <span class="keyword">await</span> res.json();
+  <span class="keyword">return</span> data.content?.[<span class="var">0</span>]?.text || <span class="string">'สวัสดีค่ะ! ยินดีช่วยหาที่พักบนเกาะสมุยค่ะ'</span>;
+}
+
+<span class="keyword">async function</span> replyLine(replyToken, text) {
+  <span class="keyword">await</span> fetch(<span class="string">'https://api.line.me/v2/bot/message/reply'</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+      <span class="string">'Authorization'</span>: <span class="string">`Bearer ${LINE_TOKEN}`</span>
+    },
+    body: JSON.stringify({
+      replyToken,
+      messages: [{ type: <span class="string">'text'</span>, text }]
+    })
+  });
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-line">3</div>
+        <div class="step-title">Set Webhook URL in Line</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">In your Line Official Account → Settings → Messaging API → Webhook URL:</div>
+        <div class="code-block">https://samui-line-bot.<span class="var">YOUR_ACCOUNT</span>.workers.dev</div>
+        <div style="margin-top:10px;font-size:13px;color:var(--muted);">Enable <strong style="color:var(--sand);">Use webhook</strong> toggle → Verify → it should show ✅ Success.</div>
+        <div style="margin-top:8px;font-size:13px;color:var(--muted);">Also turn <strong style="color:var(--sand);">OFF</strong> the auto-reply and greeting message in Line settings — your bot handles those now.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FACEBOOK ═══════════════ -->
+<div class="plat-section" id="sec-fb">
+  <div class="sec-header fb">
+    <div class="sec-icon">👤</div>
+    <div>
+      <div class="sec-title">Facebook Messenger Bot</div>
+      <div class="sec-sub">Requires Facebook Page + App + Meta review · 1–2 days</div>
+    </div>
+    <span class="difficulty diff-hard">Needs approval</span>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-fb">1</div>
+        <div class="step-title">Create a Facebook Page for your business</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body open">
+        <div class="step-desc">You need a <strong>Facebook Page</strong> (not personal profile) for the bot to work.</div>
+        <div class="dc-steps">
+          <div class="dcs"><div class="dcs-num">1</div><div>Go to <strong style="color:var(--sand);">facebook.com/pages/create</strong></div></div>
+          <div class="dcs"><div class="dcs-num">2</div><div>Category: <strong style="color:var(--sand);">Real Estate Agent</strong></div></div>
+          <div class="dcs"><div class="dcs-num">3</div><div>Name: <strong style="color:var(--sand);">Samui PM Properties</strong> or CHOWTO</div></div>
+          <div class="dcs"><div class="dcs-num">4</div><div>Add profile photo, cover photo, contact details</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-fb">2</div>
+        <div class="step-title">Create Meta Developer App</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">Go to <strong>developers.facebook.com</strong> → Create App → Business type.</div>
+        <div class="dc-steps">
+          <div class="dcs"><div class="dcs-num">1</div><div>Go to <strong style="color:var(--sand);">developers.facebook.com</strong> → My Apps → Create App</div></div>
+          <div class="dcs"><div class="dcs-num">2</div><div>Type: <strong style="color:var(--sand);">Business</strong></div></div>
+          <div class="dcs"><div class="dcs-num">3</div><div>Add product: <strong style="color:var(--sand);">Messenger</strong></div></div>
+          <div class="dcs"><div class="dcs-num">4</div><div>Connect your Facebook Page → Generate <strong style="color:var(--sand);">Page Access Token</strong></div></div>
+          <div class="dcs"><div class="dcs-num">5</div><div>Note your <strong style="color:var(--sand);">Verify Token</strong> (you choose this — any secret word)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-fb">3</div>
+        <div class="step-title">Deploy Facebook Bot Worker</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">const</span> <span class="var">PAGE_TOKEN</span> = <span class="string">'YOUR_PAGE_ACCESS_TOKEN'</span>;
+<span class="keyword">const</span> <span class="var">VERIFY_TOKEN</span> = <span class="string">'samuipm_verify_2026'</span>;
+<span class="keyword">const</span> <span class="var">CLAUDE_API_KEY</span> = <span class="string">'YOUR_CLAUDE_API_KEY'</span>;
+
+<span class="keyword">export default</span> {
+  <span class="keyword">async</span> fetch(request) {
+    <span class="keyword">const</span> url = <span class="keyword">new</span> URL(request.url);
+    
+    <span class="comment">// Webhook verification (GET)</span>
+    <span class="keyword">if</span> (request.method === <span class="string">'GET'</span>) {
+      <span class="keyword">const</span> mode = url.searchParams.get(<span class="string">'hub.mode'</span>);
+      <span class="keyword">const</span> token = url.searchParams.get(<span class="string">'hub.verify_token'</span>);
+      <span class="keyword">const</span> challenge = url.searchParams.get(<span class="string">'hub.challenge'</span>);
+      <span class="keyword">if</span> (mode === <span class="string">'subscribe'</span> && token === VERIFY_TOKEN)
+        <span class="keyword">return new</span> Response(challenge);
+      <span class="keyword">return new</span> Response(<span class="string">'Forbidden'</span>, { status: <span class="var">403</span> });
+    }
+    
+    <span class="comment">// Handle messages (POST)</span>
+    <span class="keyword">const</span> body = <span class="keyword">await</span> request.json();
+    <span class="keyword">for</span> (<span class="keyword">const</span> entry <span class="keyword">of</span> body.entry || []) {
+      <span class="keyword">for</span> (<span class="keyword">const</span> event <span class="keyword">of</span> entry.messaging || []) {
+        <span class="keyword">if</span> (!event.message?.text) <span class="keyword">continue</span>;
+        <span class="keyword">const</span> senderId = event.sender.id;
+        <span class="keyword">const</span> text = event.message.text;
+        <span class="keyword">const</span> reply = <span class="keyword">await</span> getClaudeReply(text);
+        <span class="keyword">await</span> sendFB(senderId, reply);
+      }
+    }
+    <span class="keyword">return new</span> Response(<span class="string">'OK'</span>);
+  }
+};
+
+<span class="keyword">async function</span> getClaudeReply(msg) {
+  <span class="keyword">const</span> res = <span class="keyword">await</span> fetch(<span class="string">'https://api.anthropic.com/v1/messages'</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+      <span class="string">'x-api-key'</span>: CLAUDE_API_KEY,
+      <span class="string">'anthropic-version'</span>: <span class="string">'2023-06-01'</span>
+    },
+    body: JSON.stringify({
+      model: <span class="string">'claude-haiku-4-5-20251001'</span>,
+      max_tokens: <span class="var">300</span>,
+      system: <span class="string">'You are a property assistant for Samui PM on Koh Samui, Thailand. Help international clients find rental villas. Be warm, professional, reply in English. Ask for their name, budget, dates, preferences. Offer viewings.'</span>,
+      messages: [{ role: <span class="string">'user'</span>, content: msg }]
+    })
+  });
+  <span class="keyword">const</span> data = <span class="keyword">await</span> res.json();
+  <span class="keyword">return</span> data.content?.[<span class="var">0</span>]?.text || <span class="string">'Hello! How can I help you find a property on Koh Samui? 🌴'</span>;
+}
+
+<span class="keyword">async function</span> sendFB(recipientId, text) {
+  <span class="keyword">await</span> fetch(<span class="string">`https://graph.facebook.com/v18.0/me/messages?access_token=${PAGE_TOKEN}`</span>, {
+    method: <span class="string">'POST'</span>,
+    headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+    body: JSON.stringify({
+      recipient: { id: recipientId },
+      message: { text }
+    })
+  });
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num sn-fb">4</div>
+        <div class="step-title">Set webhook + submit for review</div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">In your Meta App dashboard → Messenger → Webhooks:</div>
+        <div class="dc-steps">
+          <div class="dcs"><div class="dcs-num">1</div><div>Callback URL: your Worker URL</div></div>
+          <div class="dcs"><div class="dcs-num">2</div><div>Verify Token: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;">samuipm_verify_2026</code></div></div>
+          <div class="dcs"><div class="dcs-num">3</div><div>Subscribe to: <strong style="color:var(--sand);">messages, messaging_postbacks</strong></div></div>
+          <div class="dcs"><div class="dcs-num">4</div><div>Submit app for Meta review — select <strong style="color:var(--sand);">pages_messaging</strong> permission</div></div>
+          <div class="dcs"><div class="dcs-num">5</div><div>Usually approved in <strong style="color:var(--sand);">1–2 business days</strong></div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12.5px;color:var(--gold);">
+          💡 While waiting for approval, the bot works in <strong>test mode</strong> — you can test it with your own Facebook account.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<script>
+function showPlat(id, el) {
+  document.querySelectorAll('.plat-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  el.classList.add('active');
+}
+
+function toggleStep(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.step-toggle');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.textContent = isOpen ? '▼' : '▲';
+}
+
+function copyCode(btn) {
+  const block = btn.closest('.code-block');
+  const text = block.innerText.replace('Copy\n','').replace('Copied!\n','');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
