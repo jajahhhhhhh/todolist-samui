@@ -1,1 +1,1 @@
-# todolist-samui
+git push https://<YOUR_TOKEN>@github.com/jajahhhhhhh/todolist-samui.git main# todolist-samui
