@@ -1,6 +1,7 @@
 # CHOWTO Telegram Bot — Deployment Guide
 
 ## Prerequisites
+
 - Cloudflare account (free tier works)
 - Node.js installed
 - Telegram bot token from @BotFather
@@ -55,7 +56,8 @@ npx wrangler secret put WEBHOOK_SECRET
 ## Step 5 — Register the Webhook
 
 Visit this URL in your browser (one time only):
-```
+
+```text
 https://chowto-telegram-bot.<your-account>.workers.dev/setup
 ```
 
@@ -82,15 +84,15 @@ You should see the CHOWTO welcome message! 🏝️
 
 ## Commands Reference
 
-| Command | Action |
-|---------|--------|
-| `/start` | Welcome menu |
-| `/newlead` | Log a new client inquiry |
-| `/properties` | View property inventory |
-| `/tasks` | Today's priorities |
-| `/draft` | Draft a client message (EN/TH/RU) |
-| `/clear` | Clear chat history |
-| _free text_ | Ask anything in EN/TH/RU |
+| Command      | Action                            |
+|-------------|-----------------------------------|
+| `/start`    | Welcome menu                      |
+| `/newlead`  | Log a new client inquiry          |
+| `/properties` | View property inventory        |
+| `/tasks`    | Today's priorities                |
+| `/draft`    | Draft a client message (EN/TH/RU) |
+| `/clear`    | Clear chat history                |
+| _free text_ | Ask anything in EN/TH/RU          |
 
 ---
 
