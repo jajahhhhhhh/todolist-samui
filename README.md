@@ -1,8 +1,10 @@
 # Samui PM Suite 🌴
+
 **Property Management System — Koh Samui**
 by CHOWTO · ch-howtoniksen.com
 
 ## Apps
+
 | File | Description |
 |------|-------------|
 | index.html | Daily Hub — Planner, CRM, Properties, Templates, Kanban, Tank Projects |
@@ -13,4 +15,5 @@ by CHOWTO · ch-howtoniksen.com
 | samui-pm-bots.html | Bot Setup Guide (Telegram/Line/Facebook) |
 
 ## Live Site
+
 https://ch-howtoniksen.com
