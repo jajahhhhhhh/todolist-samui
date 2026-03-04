@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samui PM · Tasks</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand: #f5ede0;
+  --sand-dark: #dfd0b8;
+  --teal: #1a6b6b;
+  --teal-light: #2a8f8f;
+  --teal-pale: #e0f0f0;
+  --coral: #c4553a;
+  --coral-pale: #fdecea;
+  --gold: #b8893c;
+  --gold-pale: #fef6e4;
+  --night: #0f2020;
+  --text: #1c2f2f;
+  --muted: #7a9090;
+  --white: #fdfaf6;
+  --shadow: 0 4px 24px rgba(15,32,32,0.10);
+  --shadow-lg: 0 8px 40px rgba(15,32,32,0.16);
+  --radius: 14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;background-image:radial-gradient(ellipse at 80% 0%,rgba(26,107,107,0.08) 0%,transparent 60%),radial-gradient(ellipse at 10% 100%,rgba(184,137,60,0.07) 0%,transparent 50%);}
+
+header{background:var(--night);padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,0.3);height:64px;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--sand);letter-spacing:0.02em;}
+.logo span{color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:20px;}
+.stats{display:flex;gap:20px;align-items:center;}
+.stat{text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;}
+.stat strong{display:block;font-size:20px;font-weight:500;color:var(--sand);font-family:'Cormorant Garamond',serif;line-height:1.1;}
+.stat.overdue-stat strong{color:#f87171;}
+.btn-export{background:var(--gold);color:var(--night);border:none;border-radius:8px;padding:8px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;letter-spacing:0.04em;transition:opacity 0.2s;}
+.btn-export:hover{opacity:0.85;}
+
+.container{max-width:820px;margin:0 auto;padding:28px 16px 100px;}
+
+.add-card{background:var(--white);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid var(--sand-dark);}
+.add-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.add-card-header h2{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--teal);letter-spacing:0.06em;text-transform:uppercase;}
+.btn-toggle-form{background:none;border:1.5px solid var(--sand-dark);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.btn-toggle-form:hover{border-color:var(--teal);color:var(--teal);}
+
+.form-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+input[type="text"],input[type="date"],select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;border:1.5px solid var(--sand-dark);border-radius:8px;padding:10px 14px;background:var(--sand);color:var(--text);transition:border-color 0.2s;outline:none;}
+input[type="text"]:focus,input[type="date"]:focus,select:focus,textarea:focus{border-color:var(--teal-light);background:#fff;}
+input[type="text"]{flex:1;min-width:180px;}
+input[type="date"]{min-width:148px;}
+select{min-width:130px;cursor:pointer;}
+textarea{width:100%;resize:vertical;min-height:58px;font-size:13px;}
+.input-main{font-size:15px!important;font-weight:500;}
+
+.btn-add{background:var(--teal);color:white;border:none;border-radius:8px;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.1s;white-space:nowrap;}
+.btn-add:hover{background:var(--teal-light);}
+.btn-add:active{transform:scale(0.97);}
+
+.toolbar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:180px;}
+.search-wrap input{width:100%;padding-left:36px;background:var(--white);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
+.sort-select{font-size:13px;padding:9px 12px;min-width:130px;}
+
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+.filter-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-right:2px;}
+.chip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all 0.18s;background:var(--white);color:var(--muted);border-color:var(--sand-dark);}
+.chip:hover{border-color:var(--teal);color:var(--teal);}
+.chip.active{background:var(--teal);color:white;border-color:var(--teal);}
+.chip.chip-red.active{background:var(--coral);border-color:var(--coral);}
+.chip.chip-amber.active{background:var(--gold);border-color:var(--gold);}
+
+.section-label{font-family:'Cormorant Garamond',serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin:22px 0 9px;padding-left:4px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--sand-dark);}
+
+.progress-bar-wrap{height:3px;background:var(--sand-dark);border-radius:2px;margin-bottom:22px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(to right,var(--teal),var(--gold));border-radius:2px;transition:width 0.5s ease;}
+
+.task{background:var(--white);border-radius:var(--radius);padding:14px 16px 14px 18px;display:flex;align-items:flex-start;gap:13px;margin-bottom:7px;border:1.5px solid transparent;border-left:4px solid var(--sand-dark);transition:box-shadow 0.2s;animation:slideIn 0.22s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.task:hover{box-shadow:var(--shadow);}
+.task.done{opacity:0.45;}
+.task.done .task-title{text-decoration:line-through;color:var(--muted);}
+.task.prio-high{border-left-color:var(--coral);}
+.task.prio-medium{border-left-color:var(--gold);}
+.task.prio-low{border-left-color:var(--teal-light);}
+.task.overdue:not(.done){background:linear-gradient(to right,#fff8f7,var(--white));}
+
+.task-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--sand-dark);cursor:pointer;flex-shrink:0;margin-top:2px;transition:all 0.18s;display:flex;align-items:center;justify-content:center;}
+.task-check:hover{border-color:var(--teal);background:var(--teal-pale);}
+.task.done .task-check{background:var(--teal);border-color:var(--teal);}
+.task.done .task-check::after{content:'✓';color:white;font-size:11px;font-weight:700;}
+
+.task-body{flex:1;min-width:0;}
+.task-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.task-title{font-size:14.5px;font-weight:500;line-height:1.4;}
+.task-client{font-size:12px;color:var(--teal);font-weight:500;margin-bottom:3px;font-style:italic;}
+.task-client::before{content:'👤 ';}
+.task-property{font-size:12px;color:var(--gold);font-weight:500;margin-bottom:3px;}
+.task-property::before{content:'🏡 ';}
+.task-notes{font-size:12.5px;color:var(--muted);font-style:italic;margin:5px 0;line-height:1.45;border-left:2px solid var(--sand-dark);padding-left:9px;}
+.task-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:6px;}
+.task-due{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:var(--teal-pale);color:var(--teal);}
+.task-due.overdue{background:var(--coral-pale);color:var(--coral);}
+.task-due.today{background:#e8f5e9;color:#2e7d32;}
+
+.badge{font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:10px;letter-spacing:0.03em;text-transform:uppercase;}
+.badge-platform{background:var(--teal-pale);color:var(--teal);}
+.badge-platform.telegram{background:#e3f2ff;color:#1a6db5;}
+.badge-platform.line{background:#e8f5e9;color:#2e7d32;}
+.badge-platform.facebook{background:#e8eaf6;color:#3949ab;}
+.badge-platform.whatsapp{background:#e8f5e9;color:#1b5e20;}
+.badge-platform.email{background:#fff3e0;color:#e65100;}
+.badge-platform.call{background:#fce4ec;color:#880e4f;}
+.badge-cat{background:var(--sand);color:var(--text);border:1px solid var(--sand-dark);}
+.badge-prio-high{background:var(--coral-pale);color:var(--coral);}
+.badge-prio-medium{background:var(--gold-pale);color:var(--gold);}
+.badge-prio-low{background:var(--teal-pale);color:var(--teal);}
+
+.task-actions{display:flex;gap:3px;flex-shrink:0;}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;padding:3px 6px;border-radius:6px;transition:color 0.18s,background 0.18s;line-height:1;}
+.btn-icon:hover{background:var(--sand);}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,32,32,0.55);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:520px;box-shadow:var(--shadow-lg);animation:popIn 0.2s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--teal);margin-bottom:18px;}
+.modal-row{margin-bottom:11px;}
+.modal-row label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
+.modal-row input,.modal-row select,.modal-row textarea{width:100%;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+.btn-cancel{background:none;border:1.5px solid var(--sand-dark);border-radius:8px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.btn-cancel:hover{border-color:var(--coral);color:var(--coral);}
+.btn-save{background:var(--teal);color:white;border:none;border-radius:8px;padding:9px 24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.btn-save:hover{background:var(--teal-light);}
+
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:50px 0;}
+.empty .icon{font-size:42px;margin-bottom:12px;}
+
+@media(max-width:600px){
+  header{padding:0 16px;height:56px;}
+  .logo{font-size:17px;}
+  .stats{gap:12px;}
+  .stat strong{font-size:16px;}
+  .btn-export{display:none;}
+  .add-card{padding:16px;}
+}
+
+/* ── Bot Assistant ── */
+.bot-fab{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:var(--teal);color:white;border:none;cursor:pointer;font-size:22px;box-shadow:0 4px 20px rgba(26,107,107,0.45);z-index:900;transition:transform 0.2s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;}
+.bot-fab:hover{transform:scale(1.07);box-shadow:0 6px 28px rgba(26,107,107,0.55);}
+.bot-fab.open{background:var(--coral);}
+
+.bot-panel{position:fixed;bottom:92px;right:28px;width:340px;max-height:500px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:901;display:flex;flex-direction:column;border:1.5px solid var(--sand-dark);overflow:hidden;transform:scale(0.95) translateY(10px);opacity:0;pointer-events:none;transition:transform 0.2s ease,opacity 0.2s ease;}
+.bot-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
+
+.bot-header{background:var(--teal);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.bot-header-icon{font-size:18px;}
+.bot-header-text{flex:1;}
+.bot-header-text strong{display:block;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:white;letter-spacing:0.04em;}
+.bot-header-text span{font-size:11px;color:rgba(255,255,255,0.7);}
+.bot-close{background:none;border:none;color:white;font-size:16px;cursor:pointer;opacity:0.7;padding:2px 6px;border-radius:4px;line-height:1;}
+.bot-close:hover{opacity:1;background:rgba(255,255,255,0.15);}
+
+.bot-messages{flex:1;overflow-y:auto;padding:14px 14px 10px;display:flex;flex-direction:column;gap:10px;min-height:0;}
+.bot-msg{max-width:88%;animation:msgFade 0.2s ease;}
+@keyframes msgFade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.bot-msg.bot{align-self:flex-start;}
+.bot-msg.user{align-self:flex-end;}
+.bot-bubble{padding:9px 13px;border-radius:12px;font-size:13.5px;line-height:1.5;}
+.bot-msg.bot .bot-bubble{background:var(--sand);color:var(--text);border-bottom-left-radius:4px;}
+.bot-msg.user .bot-bubble{background:var(--teal);color:white;border-bottom-right-radius:4px;}
+.bot-bubble strong{font-weight:600;}
+
+.bot-tasks-created{background:var(--teal-pale);border:1px solid var(--teal-light);border-radius:8px;padding:8px 11px;margin-top:4px;font-size:12px;color:var(--teal);}
+.bot-tasks-created ul{padding-left:14px;margin:3px 0 0;}
+.bot-tasks-created li{margin-bottom:2px;}
+
+.bot-typing{align-self:flex-start;}
+.bot-typing .bot-bubble{padding:11px 14px;}
+.typing-dots{display:flex;gap:4px;align-items:center;}
+.typing-dots span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:tdot 1.2s infinite;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+.bot-quick{display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px;border-top:1px solid var(--sand-dark);flex-shrink:0;}
+.bot-quick-btn{background:var(--sand);border:1.5px solid var(--sand-dark);border-radius:20px;padding:4px 10px;font-size:11.5px;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;white-space:nowrap;}
+.bot-quick-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-pale);}
+
+.bot-input-row{display:flex;gap:8px;padding:10px 14px 14px;flex-shrink:0;border-top:1px solid var(--sand-dark);}
+.bot-input{flex:1;border:1.5px solid var(--sand-dark);border-radius:8px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);background:var(--sand);resize:none;outline:none;min-height:36px;max-height:88px;overflow-y:auto;}
+.bot-input:focus{border-color:var(--teal-light);background:#fff;}
+.bot-send{background:var(--teal);color:white;border:none;border-radius:8px;padding:0 14px;cursor:pointer;font-size:15px;flex-shrink:0;transition:background 0.2s;}
+.bot-send:hover{background:var(--teal-light);}
+.bot-send:disabled{opacity:0.5;cursor:default;}
+
+@media(max-width:600px){
+  .bot-panel{width:calc(100vw - 32px);right:16px;bottom:84px;}
+  .bot-fab{bottom:20px;right:16px;width:46px;height:46px;font-size:20px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Samui <span>PM</span> · Tasks</div>
+  <div class="header-right">
+    <div class="stats">
+      <div class="stat"><strong id="stat-open">0</strong>Open</div>
+      <div class="stat overdue-stat"><strong id="stat-overdue">0</strong>Overdue</div>
+      <div class="stat"><strong id="stat-done">0</strong>Done</div>
+    </div>
+    <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+  <div class="add-card">
+    <div class="add-card-header">
+      <h2>New Task</h2>
+      <button class="btn-toggle-form" id="toggle-btn" onclick="toggleForm()">▲ Collapse</button>
+    </div>
+    <div id="form-body">
+      <div class="form-row">
+        <input type="text" id="task-input" class="input-main" placeholder="Task description…" />
+      </div>
+      <div class="form-row">
+        <input type="text" id="inp-client" placeholder="👤 Client name (optional)" />
+        <input type="text" id="inp-property" placeholder="🏡 Property / Villa (optional)" />
+      </div>
+      <div class="form-row">
+        <select id="sel-prio">
+          <option value="high">🔴 Urgent</option>
+          <option value="medium" selected>🟡 Normal</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <select id="sel-cat">
+          <option value="Viewing">Viewing</option>
+          <option value="Rental">Rental / Payment</option>
+          <option value="Admin">Admin</option>
+          <option value="Follow-up">Follow-up</option>
+          <option value="Land Title">Land Title</option>
+          <option value="Inspection">Inspection</option>
+          <option value="Contract">Contract</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Other">Other</option>
+        </select>
+        <select id="sel-platform">
+          <option value="telegram">📲 Telegram</option>
+          <option value="line">💬 Line</option>
+          <option value="facebook">👥 Facebook</option>
+          <option value="whatsapp">📱 WhatsApp</option>
+          <option value="email">📧 Email</option>
+          <option value="call">📞 Call</option>
+          <option value="other">— Other</option>
+        </select>
+        <input type="date" id="inp-due" title="Due date" />
+      </div>
+      <div class="form-row">
+        <textarea id="inp-notes" placeholder="Notes (optional)…" style="min-height:52px;"></textarea>
+      </div>
+      <div class="form-row" style="justify-content:flex-end;">
+        <button class="btn-add" onclick="addTask()">+ Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search tasks, clients, properties…" oninput="render()" />
+    </div>
+    <select class="sort-select" id="sort-sel" onchange="render()">
+      <option value="created">Newest first</option>
+      <option value="due">By due date</option>
+      <option value="prio">By priority</option>
+      <option value="cat">By category</option>
+    </select>
+  </div>
+
+  <div class="filters">
+    <span class="filter-label">Filter:</span>
+    <div class="chip active" onclick="setFilter('all',this)">All open</div>
+    <div class="chip chip-red" onclick="setFilter('high',this)">🔴 Urgent</div>
+    <div class="chip chip-amber" onclick="setFilter('overdue',this)">⚠ Overdue</div>
+    <div class="chip" onclick="setFilter('Viewing',this)">Viewing</div>
+    <div class="chip" onclick="setFilter('Rental',this)">Rental</div>
+    <div class="chip" onclick="setFilter('Follow-up',this)">Follow-up</div>
+    <div class="chip" onclick="setFilter('Admin',this)">Admin</div>
+    <div class="chip" onclick="setFilter('Land Title',this)">Land Title</div>
+    <div class="chip" onclick="setFilter('done',this)">✓ Done</div>
+  </div>
+
+  <div id="task-list"></div>
+</div>
+
+<!-- BOT ASSISTANT -->
+<button class="bot-fab" id="bot-fab" onclick="toggleBot()" title="AI Task Assistant">🤖</button>
+
+<div class="bot-panel" id="bot-panel">
+  <div class="bot-header">
+    <span class="bot-header-icon">🤖</span>
+    <div class="bot-header-text">
+      <strong>Task Assistant</strong>
+      <span>Create tasks by describing them</span>
+    </div>
+    <button class="bot-close" onclick="toggleBot()">✕</button>
+  </div>
+  <div class="bot-messages" id="bot-messages"></div>
+  <div class="bot-quick" id="bot-quick">
+    <button class="bot-quick-btn" onclick="sendQuick('What tasks are overdue?')">⚠ Overdue</button>
+    <button class="bot-quick-btn" onclick="sendQuick('Add urgent task')">+ Urgent</button>
+    <button class="bot-quick-btn" onclick="sendQuick('What\'s next priority?')">📋 Next up</button>
+    <button class="bot-quick-btn" onclick="sendQuick('Summarise my tasks')">📊 Summary</button>
+  </div>
+  <div class="bot-input-row">
+    <textarea class="bot-input" id="bot-input" placeholder="Describe a task or ask anything…" rows="1" onkeydown="botKey(event)" oninput="botResize(this)"></textarea>
+    <button class="bot-send" id="bot-send" onclick="botSend()">➤</button>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>Edit Task</h3>
+    <div class="modal-row"><label>Description</label><input type="text" id="edit-title" /></div>
+    <div style="display:flex;gap:10px;margin-bottom:11px;">
+      <div style="flex:1;"><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Client</label><input type="text" id="edit-client" placeholder="Client name" style="width:100%" /></div>
+      <div style="flex:1;"><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Property</label><input type="text" id="edit-property" placeholder="Property / Villa" style="width:100%" /></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:11px;">
+      <div style="flex:1;"><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Priority</label>
+        <select id="edit-prio" style="width:100%"><option value="high">🔴 Urgent</option><option value="medium">🟡 Normal</option><option value="low">🟢 Low</option></select></div>
+      <div style="flex:1;"><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Due Date</label>
+        <input type="date" id="edit-due" style="width:100%" /></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:11px;">
+      <div style="flex:1;"><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Category</label>
+        <select id="edit-cat" style="width:100%"><option>Viewing</option><option>Rental</option><option>Admin</option><option>Follow-up</option><option>Land Title</option><option>Inspection</option><option>Contract</option><option>Maintenance</option><option>Other</option></select></div>
+      <div style="flex:1;"><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Platform</label>
+        <select id="edit-platform" style="width:100%"><option value="telegram">Telegram</option><option value="line">Line</option><option value="facebook">Facebook</option><option value="whatsapp">WhatsApp</option><option value="email">Email</option><option value="call">Call</option><option value="other">Other</option></select></div>
+    </div>
+    <div class="modal-row"><label>Notes</label><textarea id="edit-notes" placeholder="Notes…"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem('samui_pm_v2') || 'null');
+let activeFilter = 'all';
+let editingId = null;
+let formOpen = true;
+
+const platLabel = {telegram:'Telegram',line:'Line',facebook:'Facebook',whatsapp:'WhatsApp',email:'Email',call:'Call',other:'Other'};
+
+function save(){ localStorage.setItem('samui_pm_v2', JSON.stringify(tasks)); }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function isOverdue(due){ return due && due < today(); }
+function isToday(due){ return due && due === today(); }
+
+function fmtDate(s){
+  if(!s) return '';
+  const [y,m,d] = s.split('-');
+  return d+'/'+m+'/'+y;
+}
+
+function toggleForm(){
+  formOpen = !formOpen;
+  document.getElementById('form-body').style.display = formOpen ? '' : 'none';
+  document.getElementById('toggle-btn').textContent = formOpen ? '▲ Collapse' : '▼ Add Task';
+}
+
+function addTask(){
+  const title = document.getElementById('task-input').value.trim();
+  if(!title){ document.getElementById('task-input').focus(); return; }
+  tasks.unshift({
+    id: Date.now(),
+    title,
+    client: document.getElementById('inp-client').value.trim(),
+    property: document.getElementById('inp-property').value.trim(),
+    prio: document.getElementById('sel-prio').value,
+    cat: document.getElementById('sel-cat').value,
+    platform: document.getElementById('sel-platform').value,
+    due: document.getElementById('inp-due').value || '',
+    notes: document.getElementById('inp-notes').value.trim(),
+    done: false,
+    created: new Date().toISOString()
+  });
+  ['task-input','inp-client','inp-property','inp-notes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('inp-due').value='';
+  save(); render();
+}
+
+document.getElementById('task-input').addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
+
+function toggleDone(id){ const t=tasks.find(t=>t.id===id); if(t){t.done=!t.done; save(); render();} }
+
+function deleteTask(id){
+  if(!confirm('Delete this task?')) return;
+  tasks = tasks.filter(t=>t.id!==id); save(); render();
+}
+
+function openEdit(id){
+  const t=tasks.find(t=>t.id===id); if(!t) return;
+  editingId=id;
+  document.getElementById('edit-title').value=t.title;
+  document.getElementById('edit-client').value=t.client||'';
+  document.getElementById('edit-property').value=t.property||'';
+  document.getElementById('edit-prio').value=t.prio;
+  document.getElementById('edit-cat').value=t.cat;
+  document.getElementById('edit-platform').value=t.platform;
+  document.getElementById('edit-due').value=t.due||'';
+  document.getElementById('edit-notes').value=t.notes||'';
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); editingId=null; }
+document.getElementById('modal').addEventListener('click', e => { if(e.target===document.getElementById('modal')) closeModal(); });
+
+function saveEdit(){
+  const t=tasks.find(t=>t.id===editingId); if(!t) return;
+  const title=document.getElementById('edit-title').value.trim();
+  if(title) t.title=title;
+  t.client=document.getElementById('edit-client').value.trim();
+  t.property=document.getElementById('edit-property').value.trim();
+  t.prio=document.getElementById('edit-prio').value;
+  t.cat=document.getElementById('edit-cat').value;
+  t.platform=document.getElementById('edit-platform').value;
+  t.due=document.getElementById('edit-due').value;
+  t.notes=document.getElementById('edit-notes').value.trim();
+  closeModal(); save(); render();
+}
+
+function setFilter(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function getFiltered(){
+  const q=(document.getElementById('search-input').value||'').toLowerCase().trim();
+  let list=[...tasks];
+  if(activeFilter==='done') list=list.filter(t=>t.done);
+  else if(activeFilter==='high') list=list.filter(t=>t.prio==='high'&&!t.done);
+  else if(activeFilter==='overdue') list=list.filter(t=>isOverdue(t.due)&&!t.done);
+  else if(activeFilter!=='all') list=list.filter(t=>t.cat===activeFilter&&!t.done);
+  else list=list.filter(t=>!t.done);
+  if(q) list=list.filter(t=>[t.title,t.client,t.property,t.notes,t.cat].join(' ').toLowerCase().includes(q));
+  const sort=document.getElementById('sort-sel').value;
+  if(sort==='due') list.sort((a,b)=>(a.due||'9999')>(b.due||'9999')?1:-1);
+  else if(sort==='prio'){const p={high:0,medium:1,low:2};list.sort((a,b)=>p[a.prio]-p[b.prio]);}
+  else if(sort==='cat') list.sort((a,b)=>a.cat.localeCompare(b.cat));
+  else list.sort((a,b)=>b.id-a.id);
+  return list;
+}
+
+function taskHTML(t){
+  const over=isOverdue(t.due)&&!t.done;
+  const isTdy=isToday(t.due);
+  let dueBadge='';
+  if(t.due){
+    const cls=over?'overdue':isTdy?'today':'';
+    const lbl=over?('Overdue · '+fmtDate(t.due)):isTdy?'Today':fmtDate(t.due);
+    dueBadge=`<span class="task-due ${cls}">📅 ${lbl}</span>`;
+  }
+  return `<div class="task prio-${t.prio}${t.done?' done':''}${over?' overdue':''}">
+    <div class="task-check" onclick="toggleDone(${t.id})"></div>
+    <div class="task-body">
+      <div class="task-top">
+        <div class="task-title">${esc(t.title)}</div>
+        <div class="task-actions">
+          <button class="btn-icon" onclick="openEdit(${t.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="deleteTask(${t.id})" title="Delete">✕</button>
+        </div>
+      </div>
+      ${t.client?`<div class="task-client">${esc(t.client)}</div>`:''}
+      ${t.property?`<div class="task-property">${esc(t.property)}</div>`:''}
+      ${t.notes?`<div class="task-notes">${esc(t.notes)}</div>`:''}
+      <div class="task-meta">
+        <span class="badge badge-platform ${t.platform}">${platLabel[t.platform]||t.platform}</span>
+        <span class="badge badge-cat">${t.cat}</span>
+        <span class="badge badge-prio-${t.prio}">${t.prio==='high'?'Urgent':t.prio==='medium'?'Normal':'Low'}</span>
+        ${dueBadge}
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  const open=tasks.filter(t=>!t.done).length;
+  const done=tasks.filter(t=>t.done).length;
+  const overdue=tasks.filter(t=>isOverdue(t.due)&&!t.done).length;
+  const total=open+done;
+  document.getElementById('stat-open').textContent=open;
+  document.getElementById('stat-done').textContent=done;
+  document.getElementById('stat-overdue').textContent=overdue;
+  document.getElementById('progress-bar').style.width=total?Math.round(done/total*100)+'%':'0%';
+
+  const items=getFiltered();
+  const list=document.getElementById('task-list');
+  if(!items.length){
+    list.innerHTML='<div class="empty"><div class="icon">🌴</div>No tasks here — enjoy the sea breeze.</div>';
+    return;
+  }
+  const sort=document.getElementById('sort-sel').value;
+  let html='';
+  if(activeFilter==='all'&&sort!=='cat'){
+    [{label:'🔴 Urgent',p:'high'},{label:'🟡 Normal',p:'medium'},{label:'🟢 Low',p:'low'}].forEach(g=>{
+      const gi=items.filter(t=>t.prio===g.p);
+      if(gi.length) html+=`<div class="section-label">${g.label}</div>`+gi.map(taskHTML).join('');
+    });
+  } else if(sort==='cat'){
+    [...new Set(items.map(t=>t.cat))].forEach(cat=>{
+      html+=`<div class="section-label">${cat}</div>`+items.filter(t=>t.cat===cat).map(taskHTML).join('');
+    });
+  } else {
+    html=items.map(taskHTML).join('');
+  }
+  list.innerHTML=html;
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function exportCSV(){
+  const h=['Title','Client','Property','Category','Platform','Priority','Due Date','Notes','Status','Created'];
+  const rows=tasks.map(t=>[t.title,t.client||'',t.property||'',t.cat,platLabel[t.platform]||t.platform,t.prio,t.due||'',(t.notes||'').replace(/\n/g,' '),t.done?'Done':'Open',t.created.split('T')[0]]);
+  const csv=[h,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='samui-pm-tasks-'+today()+'.csv';
+  a.click();
+}
+
+// Sample data on first load
+if(!tasks){
+  tasks=[
+    {id:6,title:'Arrange villa viewing — Lamai sea view property',client:'Sergei Volkov',property:'Sea View Villa, Lamai',prio:'high',cat:'Viewing',platform:'telegram',due:today(),notes:'Client arrives 10am. Confirm with owner night before.',done:false,created:new Date().toISOString()},
+    {id:5,title:'Collect May rental payment',client:'',property:'Bophut Pool Villa',prio:'high',cat:'Rental',platform:'line',due:'2026-03-03',notes:'THB 45,000 due. Bank transfer or cash accepted.',done:false,created:new Date().toISOString()},
+    {id:4,title:'Follow up on Chanote title deed registration',client:'',property:'Chaweng Noi Plot',prio:'medium',cat:'Land Title',platform:'email',due:'2026-03-10',notes:'Contact Land Office — ask for update on timeline.',done:false,created:new Date().toISOString()},
+    {id:3,title:'Vehicle inspection booking — pickup truck',client:'',property:'',prio:'medium',cat:'Admin',platform:'call',due:'2026-03-05',notes:'',done:false,created:new Date().toISOString()},
+    {id:2,title:'Send rental agreement to new tenant',client:'Emma Johansson',property:'Mae Nam Beach House',prio:'low',cat:'Contract',platform:'email',due:'2026-03-07',notes:'English version, PDF signed copy required.',done:false,created:new Date().toISOString()},
+    {id:1,title:'Pool maintenance scheduled',client:'',property:'Chaweng Hilltop Villa',prio:'low',cat:'Maintenance',platform:'whatsapp',due:'',notes:'',done:true,created:new Date().toISOString()},
+  ];
+  save();
+}
+
+render();
+
+// ── Bot Assistant ──
+let botOpen = false;
+let botHistory = [];
+let botBusy = false;
+
+function toggleBot(){
+  botOpen = !botOpen;
+  document.getElementById('bot-panel').classList.toggle('open', botOpen);
+  document.getElementById('bot-fab').classList.toggle('open', botOpen);
+  if(botOpen && botHistory.length === 0) botWelcome();
+}
+
+function botWelcome(){
+  const open = tasks.filter(t=>!t.done).length;
+  const overdue = tasks.filter(t=>isOverdue(t.due)&&!t.done).length;
+  const urgent = tasks.filter(t=>t.prio==='high'&&!t.done).length;
+  let msg = `Hi! I can help you manage tasks.\n\n**Current status:** ${open} open task${open!==1?'s':''}, ${urgent} urgent, ${overdue} overdue.\n\nTell me what you need — I can create tasks from a description, give you a summary, or answer questions about your workload.`;
+  appendBotMsg('bot', msg);
+}
+
+function botKey(e){
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); botSend(); }
+}
+
+function botResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,88)+'px';
+}
+
+function sendQuick(text){
+  document.getElementById('bot-input').value = text;
+  botSend();
+}
+
+async function botSend(){
+  if(botBusy) return;
+  const input = document.getElementById('bot-input');
+  const text = input.value.trim();
+  if(!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  appendBotMsg('user', text);
+  botHistory.push({role:'user', content:text});
+
+  botBusy = true;
+  document.getElementById('bot-send').disabled = true;
+  const typingId = showTyping();
+
+  try {
+    const open = tasks.filter(t=>!t.done).length;
+    const overdue = tasks.filter(t=>isOverdue(t.due)&&!t.done).length;
+    const upcoming = tasks.filter(t=>!t.done&&t.due).sort((a,b)=>a.due>b.due?1:-1).slice(0,5)
+      .map(t=>`- [${t.prio}] ${t.title}${t.client?' ('+t.client+')':''} due ${t.due}`).join('\n') || 'None';
+    const overdueTasks = tasks.filter(t=>isOverdue(t.due)&&!t.done)
+      .map(t=>`- [${t.prio}] ${t.title}${t.client?' ('+t.client+')':''} due ${t.due}`).join('\n') || 'None';
+    const todayDate = today();
+
+    const systemPrompt = `You are a task management assistant for Samui PM, a Koh Samui property management business.
+Today is ${todayDate}.
+Task stats: ${open} open, ${overdue} overdue.
+Upcoming tasks:\n${upcoming}
+Overdue tasks:\n${overdueTasks}
+
+Your role:
+- Help create tasks from natural language descriptions
+- Answer questions about the current workload
+- Suggest priorities based on context (viewings, payments, contracts are usually high priority)
+
+Available categories: Viewing, Rental, Admin, Follow-up, Land Title, Inspection, Contract, Maintenance, Other
+Available priorities: high, medium, low
+Available platforms: telegram, line, facebook, whatsapp, email, call, other
+
+When the user wants to create one or more tasks, respond with JSON only:
+{
+  "message": "Friendly confirmation or answer",
+  "create_tasks": [
+    {
+      "title": "Task description",
+      "client": "Client name if mentioned",
+      "property": "Property if mentioned",
+      "prio": "high|medium|low",
+      "cat": "Category from list above",
+      "platform": "Platform if mentioned, else other",
+      "due": "YYYY-MM-DD if a date is mentioned, else null",
+      "notes": "Any extra details"
+    }
+  ]
+}
+
+When just answering a question (no task creation), respond with plain text. Keep answers concise. Do not use markdown code blocks.`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        system: systemPrompt,
+        messages: botHistory.slice(-10)
+      })
+    });
+
+    removeTyping(typingId);
+    const data = await res.json();
+    const raw = data?.content?.[0]?.text || '{"message":"Sorry, something went wrong."}';
+
+    let parsed = null;
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(jsonMatch){
+      try { parsed = JSON.parse(jsonMatch[0]); } catch{}
+    }
+
+    if(parsed && parsed.message){
+      botHistory.push({role:'assistant', content: parsed.message});
+      const created = parsed.create_tasks && parsed.create_tasks.length > 0;
+      appendBotMsg('bot', parsed.message, created ? parsed.create_tasks : null);
+      if(created){
+        parsed.create_tasks.forEach(t => {
+          tasks.unshift({
+            id: Date.now() + Math.random(),
+            title: t.title || 'Untitled task',
+            client: t.client || '',
+            property: t.property || '',
+            prio: ['high','medium','low'].includes(t.prio) ? t.prio : 'medium',
+            cat: t.cat || 'Other',
+            platform: t.platform || 'other',
+            due: t.due || '',
+            notes: t.notes || '',
+            done: false,
+            created: new Date().toISOString()
+          });
+        });
+        save();
+        render();
+      }
+    } else {
+      botHistory.push({role:'assistant', content: raw});
+      appendBotMsg('bot', raw);
+    }
+  } catch(err){
+    removeTyping(typingId);
+    appendBotMsg('bot', 'Could not reach the AI. Please check your connection.');
+  }
+
+  botBusy = false;
+  document.getElementById('bot-send').disabled = false;
+}
+
+function appendBotMsg(role, text, createdTasks){
+  const wrap = document.getElementById('bot-messages');
+  const div = document.createElement('div');
+  div.className = 'bot-msg ' + role;
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bot-bubble';
+  bubble.innerHTML = esc(text).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  div.appendChild(bubble);
+
+  if(createdTasks && createdTasks.length){
+    const info = document.createElement('div');
+    info.className = 'bot-tasks-created';
+    info.innerHTML = `<strong>✓ ${createdTasks.length} task${createdTasks.length>1?'s':''} created:</strong><ul>`
+      + createdTasks.map(t=>`<li>${esc(t.title)}</li>`).join('')
+      + '</ul>';
+    div.appendChild(info);
+  }
+
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function showTyping(){
+  const wrap = document.getElementById('bot-messages');
+  const id = 'typing-' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'bot-msg bot bot-typing';
+  div.id = id;
+  div.innerHTML = '<div class="bot-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+  return id;
+}
+
+function removeTyping(id){
+  const el = document.getElementById(id);
+  if(el) el.remove();
+}
+</script>
+</body>
+</html>
