@@ -1,16 +1,11 @@
-# Samui PM Suite 🌴
-**Property Management System — Koh Samui**
-by CHOWTO · ch-howtoniksen.com
+# Heading 1
 
-## Apps
-| File | Description |
-|------|-------------|
-| index.html | Daily Hub — Planner, CRM, Properties, Templates, Kanban, Tank Projects |
-| samui-pm-tasks.html | Task Manager |
-| samui-pm-pipeline.html | Pipeline Board |
-| samui-pm-chat.html | AI Chat Bots |
-| samui-pm-finance.html | Finance Tracker + Slip Scanner |
-| samui-pm-bots.html | Bot Setup Guide (Telegram/Line/Facebook) |
+This is some content.
 
-## Live Site
-https://ch-howtoniksen.com
+# Heading 2
+
+You can find more information at <https://ch-howtoniksen.com>.
+
+# Heading 3
+
+This is the last heading.
