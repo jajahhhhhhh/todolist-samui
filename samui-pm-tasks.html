@@ -649,6 +649,9 @@ When the user wants to create one or more tasks, respond with JSON only:
 
 When just answering a question (no task creation), respond with plain text. Keep answers concise. Do not use markdown code blocks.`;
 
+    // TODO: proxy this request through a Cloudflare Worker that injects x-api-key and
+    // anthropic-version headers server-side; do not call the Anthropic API directly from
+    // client-side JS as it would require embedding an API key in the browser.
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},

@@ -1,4 +1,4 @@
-curl -F "url=https://ch-howtoniksen.com/bot" "https://api.telegram.org/bot7123456789:AAHdqTcvCH1vGWJxfSeofSEs4eJAb29kcmU/setWebhook"<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -243,7 +243,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 
           <div class="flow-item"><span class="fi-who fi-client">You</span><span class="fi-msg">Samui PM Properties</span></div>
           <div class="flow-item"><span class="fi-who fi-bot">BotFather</span><span class="fi-msg">Good. Now let's choose a username for your bot. It must end in `bot`. Like this, for example: TetrisBot or tetris_bot.</span></div>
           <div class="flow-item"><span class="fi-who fi-client">You</span><span class="fi-msg">SamuiPMBot</span></div>
-          <div class="flow-item"><span class="fi-who fi-bot">BotFather</span><span class="fi-msg">Done! Congratulations on your new bot. You will find it at t.me/SamuiPMBot.<br><br>Use this token to access the HTTP API:<br><strong>7123456789:AAHdqTcvCH1vGWJxfSeofSEs4eJAb29kcmU</strong><br><br>Keep your token secure!</span></div>
+          <div class="flow-item"><span class="fi-who fi-bot">BotFather</span><span class="fi-msg">Done! Congratulations on your new bot. You will find it at t.me/SamuiPMBot.<br><br>Use this token to access the HTTP API:<br><strong>123456789:AAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</strong><br><br>Keep your token secure!</span></div>
         </div>
         <div style="margin-top:12px;padding:10px 14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12.5px;color:var(--gold);">
           ⚠️ <strong>Save that token!</strong> You'll need it in step 3. Keep it secret — anyone with this token controls your bot.
@@ -347,12 +347,13 @@ Be warm, professional, concise. Max 3-4 sentences per reply.`</span>;
         <div class="step-toggle">▼</div>
       </div>
       <div class="step-body">
-        <div class="step-desc">In the Worker code, replace these two values:</div>
+        <div class="step-desc">Store your secrets securely using Wrangler (never hard-code tokens in source):</div>
         <div class="code-block">
-<span class="keyword">const</span> <span class="var">BOT_TOKEN</span> = <span class="string">'7123456789:AAHdqTcvCH1vGWJxfSeofSEs4eJAb29kcmU'</span>;  <span class="comment">← from BotFather</span>
-<span class="keyword">const</span> <span class="var">CLAUDE_API_KEY</span> = <span class="string">'sk-ant-api03-...'</span>;  <span class="comment">← from console.anthropic.com → API Keys</span>
+<span class="comment"># Run these commands in your terminal to set secrets:</span>
+<span class="keyword">npx</span> wrangler secret put BOT_TOKEN      <span class="comment">← paste your token from BotFather</span>
+<span class="keyword">npx</span> wrangler secret put CLAUDE_API_KEY  <span class="comment">← from console.anthropic.com → API Keys</span>
         </div>
-        <div style="margin-top:10px;font-size:13px;color:var(--muted);">Then click <strong style="color:var(--sand);">Save and Deploy</strong> in the Cloudflare editor.</div>
+        <div style="margin-top:8px;font-size:13px;color:var(--muted);">In your Worker code, access them via <code>env.BOT_TOKEN</code> and <code>env.CLAUDE_API_KEY</code>.</div>
       </div>
     </div>
 

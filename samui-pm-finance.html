@@ -506,6 +506,9 @@ async function readSlipWithAI(dataUrl){
   const [meta, b64] = dataUrl.split(',');
   const mediaType = meta.match(/:(.*?);/)[1];
 
+  // TODO: proxy this request through a Cloudflare Worker that injects x-api-key and
+  // anthropic-version headers server-side; do not call the Anthropic API directly from
+  // client-side JS as it would require embedding an API key in the browser.
   const res = await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -803,7 +806,7 @@ function exportCSV(){
 // ─── HELPERS ───────────────────────────────────────────────────────────────
 function fmt(n){return Number(n).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtDate(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 // ─── INIT ──────────────────────────────────────────────────────────────────
 document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
