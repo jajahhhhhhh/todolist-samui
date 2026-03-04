@@ -1,11 +1,11 @@
-# Heading 1
+# Updated Heading
 
-This is some content.
+## Heading 2
 
-# Heading 2
+This is the content under Heading 2.
 
-You can find more information at <https://ch-howtoniksen.com>.
+## Heading 3
 
-# Heading 3
+This is the content under Heading 3.
 
-This is the last heading.
+Some other content that remains unchanged.
