@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samui PM · Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand: #f5ede0;
+  --sand-dark: #dfd0b8;
+  --teal: #1a6b6b;
+  --teal-light: #2a8f8f;
+  --teal-pale: #e0f0f0;
+  --coral: #c4553a;
+  --coral-pale: #fdecea;
+  --gold: #b8893c;
+  --gold-pale: #fef6e4;
+  --night: #0f2020;
+  --night2: #182d2d;
+  --text: #1c2f2f;
+  --muted: #7a9090;
+  --white: #fdfaf6;
+  --shadow: 0 4px 20px rgba(15,32,32,0.10);
+  --shadow-lg: 0 10px 40px rgba(15,32,32,0.18);
+  --radius: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;overflow-x:auto;}
+
+/* HEADER */
+header{background:var(--night);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:300;box-shadow:0 2px 20px rgba(0,0,0,0.3);}
+.logo{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--sand);}
+.logo span{color:var(--gold);}
+.logo em{color:var(--muted);font-style:normal;font-size:14px;margin-left:8px;font-family:'DM Sans',sans-serif;font-weight:300;}
+.header-actions{display:flex;gap:10px;align-items:center;}
+.btn-new{background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.btn-new:hover{background:var(--teal-light);}
+.btn-tasks{background:var(--gold);color:var(--night);border:none;border-radius:8px;padding:8px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-tasks:hover{opacity:0.85;}
+.total-badge{background:var(--night2);color:var(--sand-dark);font-size:11px;padding:4px 10px;border-radius:20px;letter-spacing:0.06em;}
+
+/* BOARD */
+.board-wrap{padding:20px 20px 40px;min-height:calc(100vh - 60px);}
+.board{display:flex;gap:14px;align-items:flex-start;min-width:max-content;}
+
+/* COLUMN */
+.col{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:0;}
+.col-header{padding:12px 14px 10px;display:flex;align-items:center;justify-content:space-between;border-radius:10px 10px 0 0;background:var(--night2);}
+.col-title{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--sand);display:flex;align-items:center;gap:7px;}
+.col-icon{font-size:14px;}
+.col-count{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.12);color:var(--sand-dark);}
+.col-body{background:rgba(15,32,32,0.04);border:1.5px solid var(--sand-dark);border-top:none;border-radius:0 0 10px 10px;padding:10px;min-height:300px;transition:background 0.18s;}
+.col-body.drag-over{background:var(--teal-pale);border-color:var(--teal);}
+
+/* CARD */
+.card{background:var(--white);border-radius:10px;padding:13px 14px;margin-bottom:8px;cursor:grab;border-left:3px solid var(--sand-dark);box-shadow:0 2px 8px rgba(15,32,32,0.07);transition:box-shadow 0.2s,transform 0.15s,opacity 0.2s;position:relative;animation:cardIn 0.2s ease;}
+@keyframes cardIn{from{opacity:0;transform:scale(0.96);}to{opacity:1;transform:scale(1);}}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-1px);}
+.card.dragging{opacity:0.4;transform:scale(0.97);cursor:grabbing;}
+.card.stage-inquiry{border-left-color:#7c8cf8;}
+.card.stage-viewing{border-left-color:var(--gold);}
+.card.stage-negotiation{border-left-color:#e4913a;}
+.card.stage-contract{border-left-color:var(--coral);}
+.card.stage-rental{border-left-color:var(--teal);}
+.card.stage-maintenance{border-left-color:#a855f7;}
+.card.stage-closed{border-left-color:#6ab187;}
+
+.card-name{font-size:13.5px;font-weight:500;line-height:1.35;margin-bottom:5px;color:var(--text);}
+.card-property{font-size:11.5px;color:var(--gold);font-weight:500;margin-bottom:4px;}
+.card-property::before{content:'🏡 ';}
+.card-platform{font-size:10.5px;color:var(--muted);}
+.card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.card-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:0.03em;}
+.cb-plat{background:var(--teal-pale);color:var(--teal);}
+.cb-plat.telegram{background:#e3f2ff;color:#1a6db5;}
+.cb-plat.line{background:#e8f5e9;color:#2e7d32;}
+.cb-plat.facebook{background:#e8eaf6;color:#3949ab;}
+.cb-plat.whatsapp{background:#e0f7e0;color:#1b5e20;}
+.cb-plat.email{background:#fff3e0;color:#e65100;}
+.cb-plat.call{background:#fce4ec;color:#880e4f;}
+.cb-budget{background:var(--gold-pale);color:var(--gold);}
+.cb-type{background:var(--sand);color:var(--muted);border:1px solid var(--sand-dark);}
+.card-days{font-size:10px;color:var(--muted);position:absolute;top:10px;right:10px;}
+.card-actions{display:flex;gap:4px;margin-top:8px;justify-content:flex-end;}
+.card-btn{background:none;border:none;cursor:pointer;font-size:11px;color:var(--muted);padding:2px 6px;border-radius:5px;transition:all 0.15s;}
+.card-btn:hover{background:var(--sand);color:var(--teal);}
+.card-btn.del:hover{background:var(--coral-pale);color:var(--coral);}
+
+/* EMPTY COL */
+.col-empty{text-align:center;color:var(--muted);font-size:12px;padding:24px 0;opacity:0.7;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--night);color:var(--sand);border-radius:10px;padding:14px 20px;font-size:13px;box-shadow:var(--shadow-lg);z-index:999;max-width:320px;animation:toastIn 0.3s ease;border-left:3px solid var(--gold);}
+.toast.hide{animation:toastOut 0.3s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes toastOut{to{opacity:0;transform:translateY(12px);}}
+.toast-title{font-weight:500;margin-bottom:4px;color:var(--gold);}
+.toast-body{font-size:12px;color:var(--sand-dark);line-height:1.45;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,32,32,0.6);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);animation:popIn 0.2s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(0.94);}to{opacity:1;transform:scale(1);}}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--teal);margin-bottom:20px;}
+.modal-row{margin-bottom:12px;}
+.modal-row label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
+.modal-row input,.modal-row select,.modal-row textarea{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;border:1.5px solid var(--sand-dark);border-radius:8px;padding:9px 13px;background:var(--sand);color:var(--text);outline:none;transition:border-color 0.2s;}
+.modal-row input:focus,.modal-row select:focus,.modal-row textarea:focus{border-color:var(--teal-light);background:#fff;}
+.modal-2col{display:flex;gap:10px;}
+.modal-2col .modal-row{flex:1;margin-bottom:0;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.btn-cancel{background:none;border:1.5px solid var(--sand-dark);border-radius:8px;padding:9px 18px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;}
+.btn-cancel:hover{border-color:var(--coral);color:var(--coral);}
+.btn-save{background:var(--teal);color:white;border:none;border-radius:8px;padding:9px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
+.btn-save:hover{background:var(--teal-light);}
+
+/* TASK PREVIEW in modal */
+.tasks-preview{margin-top:16px;padding:14px;background:var(--teal-pale);border-radius:8px;border-left:3px solid var(--teal);}
+.tasks-preview-title{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--teal);font-weight:500;margin-bottom:8px;}
+.tasks-preview li{font-size:12.5px;color:var(--text);margin-bottom:4px;list-style:none;display:flex;align-items:baseline;gap:6px;}
+.tasks-preview li::before{content:'→';color:var(--teal);font-weight:700;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Samui <span>PM</span> · <em>Pipeline</em></div>
+  </div>
+  <div class="header-actions">
+    <span class="total-badge" id="total-deals">0 deals</span>
+    <button class="btn-new" onclick="openNewCard()">+ New Deal</button>
+    <a class="btn-tasks" href="samui-pm-tasks.html">📋 Task App</a>
+  </div>
+</header>
+
+<div class="board-wrap">
+  <div class="board" id="board"></div>
+</div>
+
+<!-- NEW / EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">New Deal</h3>
+    <div class="modal-row"><label>Client Name *</label><input type="text" id="f-client" placeholder="e.g. Sergei Volkov" /></div>
+    <div class="modal-row"><label>Property / Villa *</label><input type="text" id="f-property" placeholder="e.g. Sea View Villa, Lamai" /></div>
+    <div class="modal-2col" style="margin-bottom:12px;">
+      <div class="modal-row"><label>Deal Type</label>
+        <select id="f-type"><option value="Long-term">Long-term Rental</option><option value="Short-term">Short-term Rental</option><option value="Sale">Sale</option></select>
+      </div>
+      <div class="modal-row"><label>Platform</label>
+        <select id="f-platform"><option value="telegram">Telegram</option><option value="line">Line</option><option value="facebook">Facebook</option><option value="whatsapp">WhatsApp</option><option value="email">Email</option><option value="call">Call</option><option value="other">Other</option></select>
+      </div>
+    </div>
+    <div class="modal-2col" style="margin-bottom:12px;">
+      <div class="modal-row"><label>Budget / Rent</label><input type="text" id="f-budget" placeholder="e.g. ฿45,000/mo" /></div>
+      <div class="modal-row"><label>Stage</label>
+        <select id="f-stage">
+          <option value="inquiry">New Inquiry</option>
+          <option value="viewing">Viewing Scheduled</option>
+          <option value="negotiation">Negotiation</option>
+          <option value="contract">Contract</option>
+          <option value="rental">Active Rental</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row"><label>Notes</label><textarea id="f-notes" placeholder="Details, requirements, dates…" style="min-height:60px;resize:vertical;"></textarea></div>
+    <div id="tasks-preview" class="tasks-preview" style="display:none;">
+      <div class="tasks-preview-title">⚡ Tasks that will be auto-generated</div>
+      <ul id="tasks-preview-list"></ul>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="modal-save-btn" onclick="saveCard()">Create Deal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const STAGES = [
+  { id:'inquiry',     icon:'🔍', label:'New Inquiry',        color:'#7c8cf8' },
+  { id:'viewing',     icon:'📅', label:'Viewing Scheduled',  color:'#b8893c' },
+  { id:'negotiation', icon:'💬', label:'Negotiation',        color:'#e4913a' },
+  { id:'contract',    icon:'📝', label:'Contract',           color:'#c4553a' },
+  { id:'rental',      icon:'🏡', label:'Active Rental',      color:'#1a6b6b' },
+  { id:'maintenance', icon:'🔧', label:'Maintenance',        color:'#a855f7' },
+  { id:'closed',      icon:'✅', label:'Closed / Done',      color:'#6ab187' },
+];
+
+// Tasks auto-generated when entering each stage
+const STAGE_TASKS = {
+  inquiry: [
+    { title:'Reply to client inquiry', cat:'Follow-up', prio:'high' },
+    { title:'Send property details & photos', cat:'Admin', prio:'high' },
+  ],
+  viewing: [
+    { title:'Confirm viewing appointment with owner', cat:'Viewing', prio:'high' },
+    { title:'Prepare property info pack', cat:'Admin', prio:'medium' },
+    { title:'Send viewing confirmation to client', cat:'Viewing', prio:'high' },
+  ],
+  negotiation: [
+    { title:'Discuss terms & price with client', cat:'Follow-up', prio:'high' },
+    { title:'Counter-offer communication to owner', cat:'Follow-up', prio:'medium' },
+    { title:'Draft rental/sale proposal', cat:'Admin', prio:'medium' },
+  ],
+  contract: [
+    { title:'Prepare rental agreement / contract', cat:'Contract', prio:'high' },
+    { title:'Collect KYC documents from client', cat:'Admin', prio:'high' },
+    { title:'Send contract for signatures', cat:'Contract', prio:'high' },
+    { title:'Collect deposit payment', cat:'Rental', prio:'high' },
+  ],
+  rental: [
+    { title:'Key handover & property walkthrough', cat:'Viewing', prio:'high' },
+    { title:'Set up rent collection schedule', cat:'Rental', prio:'high' },
+    { title:'Register tenant details (if required)', cat:'Admin', prio:'medium' },
+    { title:'Send welcome message & house rules', cat:'Admin', prio:'medium' },
+  ],
+  maintenance: [
+    { title:'Log maintenance issue details', cat:'Maintenance', prio:'high' },
+    { title:'Contact maintenance team / vendor', cat:'Maintenance', prio:'high' },
+    { title:'Follow up with tenant on issue status', cat:'Follow-up', prio:'medium' },
+  ],
+  closed: [
+    { title:'Collect final payment / balance', cat:'Rental', prio:'high' },
+    { title:'Conduct exit inspection', cat:'Inspection', prio:'high' },
+    { title:'Return deposit (if applicable)', cat:'Admin', prio:'medium' },
+    { title:'Archive deal documents', cat:'Admin', prio:'low' },
+  ],
+};
+
+const platLabel = {telegram:'Telegram',line:'Line',facebook:'Facebook',whatsapp:'WhatsApp',email:'Email',call:'Call',other:'Other'};
+
+let deals = JSON.parse(localStorage.getItem('samui_pm_pipeline') || 'null');
+let editingId = null;
+let dragId = null;
+
+function saveDeal(){ localStorage.setItem('samui_pm_pipeline', JSON.stringify(deals)); }
+
+// ── TASK INTEGRATION ──────────────────────────────────────────────────────────
+function generateTasks(deal, stage){
+  const templates = STAGE_TASKS[stage] || [];
+  if(!templates.length) return [];
+  const existing = JSON.parse(localStorage.getItem('samui_pm_v2') || '[]');
+  const newTasks = templates.map(t => ({
+    id: Date.now() + Math.random(),
+    title: t.title + (deal.property ? ' — ' + deal.property : ''),
+    client: deal.client,
+    property: deal.property,
+    prio: t.prio,
+    cat: t.cat,
+    platform: deal.platform,
+    due: '',
+    notes: `Auto-generated for ${STAGES.find(s=>s.id===stage).label} stage.`,
+    done: false,
+    created: new Date().toISOString(),
+  }));
+  localStorage.setItem('samui_pm_v2', JSON.stringify([...newTasks, ...existing]));
+  return newTasks;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  const total = deals.length;
+  document.getElementById('total-deals').textContent = total + ' deal' + (total!==1?'s':'');
+
+  STAGES.forEach(stage => {
+    const cards = deals.filter(d => d.stage === stage.id);
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.innerHTML = `
+      <div class="col-header" style="border-top:3px solid ${stage.color};">
+        <div class="col-title"><span class="col-icon">${stage.icon}</span>${stage.label}</div>
+        <span class="col-count">${cards.length}</span>
+      </div>
+      <div class="col-body" id="col-${stage.id}" data-stage="${stage.id}">
+        ${cards.length === 0 ? '<div class="col-empty">Drop here</div>' : ''}
+        ${cards.map(c => cardHTML(c)).join('')}
+      </div>`;
+    board.appendChild(col);
+  });
+
+  // Drag events on columns
+  document.querySelectorAll('.col-body').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      if(dragId == null) return;
+      const newStage = col.dataset.stage;
+      const deal = deals.find(d => d.id == dragId);
+      if(deal && deal.stage !== newStage){
+        const oldStage = deal.stage;
+        deal.stage = newStage;
+        deal.stageDate = new Date().toISOString();
+        saveDeal();
+        const generated = generateTasks(deal, newStage);
+        render();
+        showToast(deal, newStage, generated);
+      }
+      dragId = null;
+    });
+  });
+
+  // Drag events on cards
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('dragstart', e => {
+      dragId = card.dataset.id;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      dragId = null;
+    });
+  });
+}
+
+function cardHTML(deal){
+  const stage = deal.stage;
+  const daysInStage = deal.stageDate
+    ? Math.floor((Date.now() - new Date(deal.stageDate)) / 86400000)
+    : 0;
+  const dayLabel = daysInStage === 0 ? 'Today' : daysInStage + 'd';
+  return `<div class="card stage-${stage}" draggable="true" data-id="${deal.id}">
+    <span class="card-days">${dayLabel}</span>
+    <div class="card-name">${esc(deal.client)}</div>
+    ${deal.property ? `<div class="card-property">${esc(deal.property)}</div>` : ''}
+    <div class="card-meta">
+      <span class="card-badge cb-plat ${deal.platform}">${platLabel[deal.platform]||deal.platform}</span>
+      <span class="card-badge cb-type">${deal.type||'Rental'}</span>
+      ${deal.budget ? `<span class="card-badge cb-budget">${esc(deal.budget)}</span>` : ''}
+    </div>
+    ${deal.notes ? `<div style="font-size:11.5px;color:var(--muted);margin-top:6px;font-style:italic;line-height:1.4;">${esc(deal.notes).substring(0,80)}${deal.notes.length>80?'…':''}</div>` : ''}
+    <div class="card-actions">
+      <button class="card-btn" onclick="openEditCard(${deal.id})">✏️ Edit</button>
+      <button class="card-btn del" onclick="deleteDeal(${deal.id})">✕</button>
+    </div>
+  </div>`;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openNewCard(){
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'New Deal';
+  document.getElementById('modal-save-btn').textContent = 'Create Deal';
+  ['f-client','f-property','f-budget','f-notes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('f-platform').value='telegram';
+  document.getElementById('f-type').value='Long-term';
+  document.getElementById('f-stage').value='inquiry';
+  updateTasksPreview('inquiry');
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('f-stage').addEventListener('change', e => updateTasksPreview(e.target.value));
+  setTimeout(()=>document.getElementById('f-client').focus(), 100);
+}
+
+function openEditCard(id){
+  const d = deals.find(d=>d.id===id); if(!d) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Deal';
+  document.getElementById('modal-save-btn').textContent = 'Save Changes';
+  document.getElementById('f-client').value = d.client||'';
+  document.getElementById('f-property').value = d.property||'';
+  document.getElementById('f-budget').value = d.budget||'';
+  document.getElementById('f-notes').value = d.notes||'';
+  document.getElementById('f-platform').value = d.platform||'telegram';
+  document.getElementById('f-type').value = d.type||'Long-term';
+  document.getElementById('f-stage').value = d.stage||'inquiry';
+  document.getElementById('tasks-preview').style.display='none';
+  document.getElementById('modal').classList.add('open');
+}
+
+function updateTasksPreview(stage){
+  const tasks = STAGE_TASKS[stage]||[];
+  const preview = document.getElementById('tasks-preview');
+  const list = document.getElementById('tasks-preview-list');
+  if(!tasks.length){ preview.style.display='none'; return; }
+  preview.style.display='block';
+  list.innerHTML = tasks.map(t=>`<li><strong>${t.prio==='high'?'🔴':'🟡'}</strong> ${t.title}</li>`).join('');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); editingId=null; }
+document.getElementById('modal').addEventListener('click', e=>{ if(e.target===document.getElementById('modal')) closeModal(); });
+
+function saveCard(){
+  const client = document.getElementById('f-client').value.trim();
+  const property = document.getElementById('f-property').value.trim();
+  if(!client){ document.getElementById('f-client').focus(); return; }
+  const stage = document.getElementById('f-stage').value;
+
+  if(editingId){
+    const d = deals.find(d=>d.id===editingId);
+    if(d){
+      const stageChanged = d.stage !== stage;
+      d.client=client; d.property=property;
+      d.budget=document.getElementById('f-budget').value.trim();
+      d.notes=document.getElementById('f-notes').value.trim();
+      d.platform=document.getElementById('f-platform').value;
+      d.type=document.getElementById('f-type').value;
+      d.stage=stage;
+      if(stageChanged){ d.stageDate=new Date().toISOString(); generateTasks(d,stage); }
+    }
+  } else {
+    const deal = {
+      id: Date.now(),
+      client, property,
+      budget: document.getElementById('f-budget').value.trim(),
+      notes: document.getElementById('f-notes').value.trim(),
+      platform: document.getElementById('f-platform').value,
+      type: document.getElementById('f-type').value,
+      stage,
+      stageDate: new Date().toISOString(),
+      created: new Date().toISOString(),
+    };
+    deals.unshift(deal);
+    const generated = generateTasks(deal, stage);
+    saveDeal(); closeModal(); render();
+    showToast(deal, stage, generated);
+    return;
+  }
+  saveDeal(); closeModal(); render();
+}
+
+function deleteDeal(id){
+  if(!confirm('Delete this deal?')) return;
+  deals = deals.filter(d=>d.id!==id); saveDeal(); render();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(deal, stage, generated){
+  const existing = document.querySelector('.toast');
+  if(existing) existing.remove();
+  if(toastTimer) clearTimeout(toastTimer);
+  const stageObj = STAGES.find(s=>s.id===stage);
+  const t = document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<div class="toast-title">${stageObj.icon} Moved to ${stageObj.label}</div>
+    <div class="toast-body">${deal.client}${generated.length ? `<br>⚡ ${generated.length} task${generated.length>1?'s':''} added to Task App` : ''}</div>`;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(()=>{ t.classList.add('hide'); setTimeout(()=>t.remove(),300); }, 4000);
+}
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── SAMPLE DATA ───────────────────────────────────────────────────────────────
+if(!deals){
+  deals = [
+    {id:1,client:'Sergei Volkov',property:'Sea View Villa, Lamai',budget:'฿120,000/mo',platform:'telegram',type:'Long-term',stage:'viewing',notes:'Wants 3-bed, sea view, pool. Budget flexible.',stageDate:new Date(Date.now()-86400000).toISOString(),created:new Date().toISOString()},
+    {id:2,client:'Emma Johansson',property:'Mae Nam Beach House',budget:'฿45,000/mo',platform:'email',type:'Long-term',stage:'rental',notes:'6-month contract signed.',stageDate:new Date(Date.now()-5*86400000).toISOString(),created:new Date().toISOString()},
+    {id:3,client:'David Chen',property:'Chaweng Hilltop Villa',budget:'฿25,000/mo',platform:'facebook',type:'Short-term',stage:'inquiry',notes:'Looking for Jan–Feb.',stageDate:new Date().toISOString(),created:new Date().toISOString()},
+    {id:4,client:'Anna Mueller',property:'Bophut Pool Villa',budget:'฿18M',platform:'line',type:'Sale',stage:'negotiation',notes:'Serious buyer, 2nd viewing done.',stageDate:new Date(Date.now()-2*86400000).toISOString(),created:new Date().toISOString()},
+    {id:5,client:'Phupha Estate',property:'Chaweng Noi Land Plot',budget:'',platform:'call',type:'Sale',stage:'contract',notes:'Title deed check in progress.',stageDate:new Date(Date.now()-3*86400000).toISOString(),created:new Date().toISOString()},
+    {id:6,client:'Tom & Lisa Webb',property:'Maenam Garden Villa',budget:'฿35,000/mo',platform:'whatsapp',type:'Long-term',stage:'closed',notes:'Left Sep 2025. Good tenants.',stageDate:new Date(Date.now()-60*86400000).toISOString(),created:new Date().toISOString()},
+  ];
+  saveDeal();
+}
+
+render();
+</script>
+</body>
+</html>

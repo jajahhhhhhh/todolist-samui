@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samui PM · Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0f0a;--bg2:#0f1a0f;--bg3:#131f13;--bg4:#1a2a1a;
+  --green:#2d6a2d;--green-light:#3d8a3d;--green-bright:#4caf50;
+  --green-pale:#e8f5e9;--green-glow:rgba(76,175,80,0.15);
+  --gold:#c9a84c;--gold-light:#e8c870;--gold-pale:#fdf6e3;
+  --coral:#d4634a;--coral-pale:#fdecea;
+  --sand:#f2e8d5;--sand-dark:#d4c4a8;
+  --text:#e8f0e8;--muted:#6b8f6b;--muted2:#4a6b4a;
+  --white:#f8faf8;--border:rgba(76,175,80,0.12);
+  --shadow:0 4px 24px rgba(0,0,0,0.4);--radius:14px;
+  --teal:#1a6b6b;--teal-pale:#e0f0f0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+
+/* ── HEADER ── */
+header{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;position:relative;z-index:100;}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sand);}
+.logo span{color:var(--gold);}
+.logo-sub{font-size:11px;font-weight:300;color:var(--muted);margin-left:6px;font-family:'Outfit',sans-serif;letter-spacing:0.05em;}
+.header-time{margin-left:auto;font-size:12px;color:var(--muted);letter-spacing:0.06em;font-weight:300;}
+.header-nav{display:flex;gap:6px;margin-left:12px;}
+.hn{font-size:11.5px;font-weight:500;padding:5px 12px;border-radius:7px;background:rgba(255,255,255,0.04);color:var(--muted);text-decoration:none;border:1px solid transparent;transition:all 0.18s;}
+.hn:hover{background:rgba(76,175,80,0.1);color:var(--green-bright);border-color:rgba(76,175,80,0.2);}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;overflow-x:auto;}
+.tab{padding:0 22px;height:46px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
+.tab:hover{color:var(--text);background:rgba(76,175,80,0.05);}
+.tab.active{color:var(--green-bright);border-bottom-color:var(--green-bright);background:rgba(76,175,80,0.06);}
+.tab-icon{font-size:16px;}
+
+/* ── CONTENT AREA ── */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;}
+.content::-webkit-scrollbar{width:4px;}
+.content::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.page{display:none;padding:24px;max-width:1100px;margin:0 auto;}
+.page#page-kanban{padding:0;max-width:none;display:none;flex-direction:column;flex:1;overflow:hidden;}
+.page#page-kanban.active{display:flex;}
+.page.active{display:block;}
+
+/* ══════════════════════════════════════════════
+   PAGE 1: DAILY PLANNER
+══════════════════════════════════════════════ */
+.planner-greeting{margin-bottom:24px;}
+.greeting-line{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--sand);line-height:1.2;}
+.greeting-sub{font-size:14px;color:var(--muted);margin-top:6px;font-weight:300;}
+.date-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--gold);font-weight:500;margin-top:10px;}
+
+.briefing-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;}
+.brief-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;}
+.brief-card:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,0.3);}
+.brief-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(76,175,80,0.04),transparent);pointer-events:none;}
+.bc-icon{font-size:24px;margin-bottom:10px;}
+.bc-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:500;margin-bottom:4px;}
+.bc-val{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--sand);line-height:1;}
+.bc-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.bc-val.warn{color:var(--coral);}
+.bc-val.ok{color:var(--green-bright);}
+.bc-val.gold{color:var(--gold);}
+
+.section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--sand);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.section-title span{font-size:12px;font-family:'Outfit',sans-serif;font-weight:400;color:var(--muted);}
+
+.today-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
+.today-item{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--muted2);border-radius:10px;padding:13px 16px;display:flex;align-items:flex-start;gap:12px;transition:border-color 0.2s;}
+.today-item.urgent{border-left-color:var(--coral);}
+.today-item.viewing{border-left-color:var(--gold);}
+.today-item.payment{border-left-color:var(--green-bright);}
+.today-item.task{border-left-color:var(--teal);}
+.ti-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.ti-body{flex:1;}
+.ti-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.ti-meta{font-size:12px;color:var(--muted);}
+.ti-time{font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;}
+.empty-day{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-day .ei{font-size:36px;margin-bottom:10px;}
+
+/* weather widget */
+.weather-bar{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:20px;}
+.weather-icon{font-size:40px;}
+.weather-temp{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--sand);}
+.weather-details{flex:1;}
+.weather-loc{font-size:13px;color:var(--muted);margin-bottom:2px;}
+.weather-desc{font-size:15px;font-weight:500;color:var(--text);}
+.weather-extra{display:flex;gap:16px;margin-top:4px;}
+.we{font-size:12px;color:var(--muted);}
+
+/* ══════════════════════════════════════════════
+   PAGE 2: CLIENT CRM
+══════════════════════════════════════════════ */
+.crm-toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-box{position:relative;flex:1;min-width:180px;}
+.search-box input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px 9px 34px;font-family:'Outfit',sans-serif;font-size:13.5px;color:var(--text);outline:none;transition:border-color 0.2s;}
+.search-box input::placeholder{color:var(--muted2);}
+.search-box input:focus{border-color:rgba(76,175,80,0.4);}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:13px;pointer-events:none;}
+.btn-green{background:var(--green);color:var(--text);border:none;border-radius:9px;padding:9px 18px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.btn-green:hover{background:var(--green-light);}
+
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.client-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all 0.2s;position:relative;}
+.client-card:hover{border-color:rgba(76,175,80,0.35);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.client-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin-bottom:12px;flex-shrink:0;font-family:'Playfair Display',serif;}
+.client-name{font-size:15px;font-weight:600;color:var(--sand);margin-bottom:3px;}
+.client-nat{font-size:12px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.client-meta{display:flex;gap:6px;flex-wrap:wrap;}
+.cmeta{font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:7px;text-transform:uppercase;}
+.cm-budget{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.2);}
+.cm-platform{background:rgba(76,175,80,0.1);color:var(--green-bright);border:1px solid rgba(76,175,80,0.2);}
+.cm-stage{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
+.cm-type{background:rgba(26,107,107,0.15);color:#5fc7c7;border:1px solid rgba(26,107,107,0.2);}
+.client-last{font-size:11px;color:var(--muted2);margin-top:9px;padding-top:9px;border-top:1px solid var(--border);}
+.client-card .edit-overlay{position:absolute;top:12px;right:12px;display:flex;gap:5px;opacity:0;transition:opacity 0.2s;}
+.client-card:hover .edit-overlay{opacity:1;}
+.icon-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;color:var(--muted);transition:all 0.15s;}
+.icon-btn:hover{background:rgba(76,175,80,0.15);color:var(--green-bright);}
+.icon-btn.del:hover{background:rgba(212,99,74,0.15);color:var(--coral);}
+
+/* ══════════════════════════════════════════════
+   PAGE 3: PROPERTY INVENTORY
+══════════════════════════════════════════════ */
+.props-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.prop-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all 0.2s;cursor:pointer;}
+.prop-card:hover{border-color:rgba(76,175,80,0.35);box-shadow:0 6px 24px rgba(0,0,0,0.35);}
+.prop-thumb{height:130px;background:linear-gradient(135deg,var(--bg4),var(--bg2));display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;border-bottom:1px solid var(--border);}
+.prop-status-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:0.06em;}
+.ps-available{background:rgba(76,175,80,0.2);color:var(--green-bright);border:1px solid rgba(76,175,80,0.3);}
+.ps-rented{background:rgba(26,107,107,0.25);color:#5fc7c7;border:1px solid rgba(26,107,107,0.3);}
+.ps-maintenance{background:rgba(212,99,74,0.2);color:var(--coral);border:1px solid rgba(212,99,74,0.3);}
+.ps-reserved{background:rgba(201,168,76,0.2);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+.prop-body{padding:15px 16px;}
+.prop-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--sand);margin-bottom:3px;}
+.prop-location{font-size:12px;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:4px;}
+.prop-specs{display:flex;gap:12px;margin-bottom:10px;}
+.spec{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+.prop-rate{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--gold);}
+.prop-rate-label{font-size:11px;color:var(--muted2);font-family:'Outfit',sans-serif;}
+.prop-owner{font-size:11.5px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.prop-actions{display:flex;gap:6px;margin-top:10px;}
+.pa-btn{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11.5px;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.18s;text-align:center;}
+.pa-btn:hover{background:rgba(76,175,80,0.1);color:var(--green-bright);border-color:rgba(76,175,80,0.25);}
+
+/* ══════════════════════════════════════════════
+   PAGE 4: MESSAGE TEMPLATES
+══════════════════════════════════════════════ */
+.templates-layout{display:grid;grid-template-columns:220px 1fr;gap:18px;}
+.template-cats{display:flex;flex-direction:column;gap:4px;}
+.tcat{padding:10px 14px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all 0.18s;display:flex;align-items:center;gap:8px;border:1px solid transparent;}
+.tcat:hover{background:rgba(76,175,80,0.07);color:var(--text);}
+.tcat.active{background:rgba(76,175,80,0.12);color:var(--green-bright);border-color:rgba(76,175,80,0.2);}
+.tcat-count{margin-left:auto;font-size:10px;background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:8px;}
+.templates-list{display:flex;flex-direction:column;gap:10px;}
+.template-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color 0.2s;}
+.template-item:hover{border-color:rgba(76,175,80,0.3);}
+.ti-header{padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.ti-title-text{font-size:14px;font-weight:500;color:var(--text);flex:1;}
+.ti-lang-badges{display:flex;gap:5px;}
+.lang-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:0.04em;}
+.lb-en{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);}
+.lb-th{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.18);}
+.lb-ru{background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.2);}
+.ti-body-content{display:none;padding:0 16px 14px;border-top:1px solid var(--border);}
+.ti-body-content.open{display:block;}
+.lang-tabs{display:flex;gap:0;margin:12px 0 10px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.ltab{padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:'Outfit',sans-serif;transition:all 0.18s;}
+.ltab.active{background:rgba(76,175,80,0.15);color:var(--green-bright);}
+.message-box{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;font-size:13.5px;line-height:1.65;color:var(--text);white-space:pre-wrap;font-family:'Outfit',sans-serif;min-height:80px;}
+.template-actions{display:flex;gap:8px;margin-top:10px;}
+.btn-copy{background:var(--green);color:white;border:none;border-radius:8px;padding:8px 18px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.btn-copy:hover{background:var(--green-light);}
+.btn-copy.copied{background:var(--green-bright);}
+.share-btns{display:flex;gap:6px;}
+.sbtn{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-family:'Outfit',sans-serif;transition:all 0.18s;}
+.sbtn:hover{background:rgba(76,175,80,0.1);color:var(--green-bright);border-color:rgba(76,175,80,0.25);}
+.add-template-btn{display:flex;align-items:center;gap:8px;padding:14px 16px;background:rgba(76,175,80,0.05);border:1px dashed rgba(76,175,80,0.2);border-radius:var(--radius);cursor:pointer;font-size:13.5px;color:var(--muted);transition:all 0.2s;margin-top:6px;}
+.add-template-btn:hover{background:rgba(76,175,80,0.1);color:var(--green-bright);border-color:rgba(76,175,80,0.35);}
+
+/* ── SHARED: MODAL ── */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.modal-ov.open{display:flex;}
+.modal-box{background:var(--bg2);border:1px solid rgba(76,175,80,0.2);border-radius:var(--radius);padding:28px;width:100%;max-width:540px;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:popIn 0.22s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(0.93) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-box h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sand);margin-bottom:20px;}
+.mrow{margin-bottom:12px;}
+.mrow label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);margin-bottom:5px;font-weight:500;}
+.mrow input,.mrow select,.mrow textarea{width:100%;font-family:'Outfit',sans-serif;font-size:13.5px;border:1px solid var(--border);border-radius:8px;padding:9px 13px;background:rgba(255,255,255,0.04);color:var(--text);outline:none;transition:border-color 0.2s;}
+.mrow input::placeholder,.mrow textarea::placeholder{color:var(--muted2);}
+.mrow input:focus,.mrow select:focus,.mrow textarea:focus{border-color:rgba(76,175,80,0.4);}
+.mrow select option{background:var(--bg2);}
+.m2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.m3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+.btn-cancel{background:none;border:1px solid var(--border);border-radius:8px;padding:9px 18px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.btn-cancel:hover{border-color:var(--coral);color:var(--coral);}
+.btn-save{background:var(--green);color:white;border:none;border-radius:8px;padding:9px 22px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-save:hover{background:var(--green-light);}
+
+/* CHIPS */
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.fchip{padding:5px 12px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);transition:all 0.18s;}
+.fchip:hover{border-color:rgba(76,175,80,0.35);color:var(--text);}
+.fchip.active{background:rgba(76,175,80,0.15);color:var(--green-bright);border-color:rgba(76,175,80,0.3);}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--bg2);border:1px solid rgba(76,175,80,0.3);border-left:3px solid var(--green-bright);color:var(--text);border-radius:10px;padding:12px 18px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,0.4);z-index:999;animation:popIn 0.25s ease;max-width:300px;}
+
+/* ══════════════════════════════════════════════
+   PAGE 5: KANBAN
+══════════════════════════════════════════════ */
+#page-kanban{padding:0;max-width:none;height:100%;}
+.kanban-toolbar{padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
+.kanban-toolbar h2{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--sand);}
+.kanban-summary{display:flex;gap:14px;margin-left:10px;}
+.ks-stat{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+.ks-stat strong{color:var(--text);}
+.kb-board{display:flex;gap:0;overflow-x:auto;height:calc(100vh - 162px);padding:16px 20px;gap:10px;align-items:flex-start;}
+.kb-board::-webkit-scrollbar{height:5px;}
+.kb-board::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+/* COLUMN */
+.kb-col{flex-shrink:0;width:230px;display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:100%;}
+.kb-col-header{padding:12px 14px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.kb-col-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.kb-col-title{font-size:12.5px;font-weight:600;color:var(--text);flex:1;letter-spacing:0.02em;}
+.kb-col-count{font-size:11px;background:rgba(255,255,255,0.07);color:var(--muted);padding:1px 7px;border-radius:8px;font-weight:500;}
+.kb-col-body{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:7px;min-height:60px;}
+.kb-col-body::-webkit-scrollbar{width:3px;}
+.kb-col-body::-webkit-scrollbar-thumb{background:var(--bg4);}
+.kb-col-body.drag-over{background:rgba(76,175,80,0.07);outline:2px dashed rgba(76,175,80,0.3);outline-offset:-4px;border-radius:8px;}
+.kb-col-add{padding:8px;flex-shrink:0;border-top:1px solid var(--border);}
+.kb-add-btn{width:100%;background:none;border:1px dashed rgba(76,175,80,0.15);border-radius:7px;padding:7px;font-size:12px;color:var(--muted2);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.18s;}
+.kb-add-btn:hover{background:rgba(76,175,80,0.07);color:var(--green-bright);border-color:rgba(76,175,80,0.3);}
+
+/* CARD */
+.kb-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 12px;cursor:grab;transition:box-shadow 0.2s,transform 0.15s,border-color 0.2s;border-left:3px solid var(--border);position:relative;user-select:none;}
+.kb-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.35);border-color:rgba(76,175,80,0.2);}
+.kb-card.dragging{opacity:0.45;transform:rotate(2deg);cursor:grabbing;}
+.kc-client{font-size:13px;font-weight:600;color:var(--sand);margin-bottom:3px;}
+.kc-property{font-size:11.5px;color:var(--gold);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kc-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.kc-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:6px;text-transform:uppercase;}
+.kcb-type{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
+.kcb-price{background:rgba(201,168,76,0.12);color:var(--gold);border:1px solid rgba(201,168,76,0.18);}
+.kcb-plat{background:rgba(76,175,80,0.08);color:var(--green-bright);border:1px solid rgba(76,175,80,0.15);}
+.kc-days{font-size:10.5px;color:var(--muted2);}
+.kc-actions{display:flex;gap:4px;margin-top:8px;opacity:0;transition:opacity 0.15s;}
+.kb-card:hover .kc-actions{opacity:1;}
+.kca-btn{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:5px;padding:4px;font-size:10.5px;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif;text-align:center;transition:all 0.15s;}
+.kca-btn:hover{background:rgba(76,175,80,0.1);color:var(--green-bright);}
+.kca-btn.del:hover{background:rgba(212,99,74,0.12);color:var(--coral);}
+
+/* ADD CARD MODAL */
+#kcard-modal .modal-box{max-width:460px;}
+
+@media(max-width:700px){
+  .briefing-grid{grid-template-columns:1fr 1fr;}
+  .templates-layout{grid-template-columns:1fr;}
+  .template-cats{flex-direction:row;flex-wrap:wrap;}
+  .page{padding:16px;}
+  .kb-col{width:200px;}
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 6: TANK PROJECTS
+══════════════════════════════════════════════ */
+.tank-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+.tank-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--sand);}
+.tank-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+.tank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;}
+.tank-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:all 0.2s;}
+.tank-card:hover{border-color:rgba(76,175,80,0.35);box-shadow:0 6px 28px rgba(0,0,0,0.35);}
+.tank-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.tank-card.concept::before{background:linear-gradient(90deg,#7c3aed,#a855f7);}
+.tank-card.planning::before{background:linear-gradient(90deg,var(--gold),#f59e0b);}
+.tank-card.active::before{background:linear-gradient(90deg,var(--green-bright),#22c55e);}
+.tank-card.hold::before{background:linear-gradient(90deg,#64748b,#94a3b8);}
+.tank-card.done::before{background:linear-gradient(90deg,var(--teal),#14b8a6);}
+.tank-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.tank-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--sand);}
+.tank-status-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;}
+.tsb-concept{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.25);}
+.tsb-planning{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.25);}
+.tsb-active{background:rgba(76,175,80,0.15);color:var(--green-bright);border:1px solid rgba(76,175,80,0.25);}
+.tsb-hold{background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);}
+.tsb-done{background:rgba(26,144,144,0.15);color:#5fc7c7;border:1px solid rgba(26,144,144,0.25);}
+.tank-cat{font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.tank-vision{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+.tank-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.tstat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+.tstat-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);font-weight:500;margin-bottom:2px;}
+.tstat-val{font-size:13px;font-weight:600;color:var(--text);}
+.tank-milestones{margin-bottom:12px;}
+.tm-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:500;margin-bottom:6px;}
+.tm-item{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:8px;align-items:flex-start;}
+.tm-item:last-child{border-bottom:none;}
+.tank-actions{display:flex;gap:7px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.tank-btn{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;padding:7px;font-size:11.5px;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.18s;text-align:center;}
+.tank-btn:hover{background:rgba(76,175,80,0.1);color:var(--green-bright);border-color:rgba(76,175,80,0.25);}
+.tank-btn.nb{background:rgba(66,133,244,0.08);color:#74a7f7;border-color:rgba(66,133,244,0.2);}
+.tank-btn.nb:hover{background:rgba(66,133,244,0.15);}
+.tank-btn.del:hover{background:rgba(212,99,74,0.12);color:var(--coral);}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span class="logo">Samui <span>PM</span></span>
+    <span class="logo-sub">· Daily Hub</span>
+  </div>
+  <div class="header-nav">
+    <a class="hn" href="samui-pm-tasks.html">📋 Tasks</a>
+    <a class="hn" href="samui-pm-pipeline.html">📊 Pipeline</a>
+    <a class="hn" href="samui-pm-chat.html">💬 Chat</a>
+    <a class="hn" href="samui-pm-finance.html">💰 Finance</a>
+  </div>
+  <div class="header-time" id="header-time"></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('planner',this)"><span class="tab-icon">🌅</span>Daily Planner</div>
+  <div class="tab" onclick="showPage('crm',this)"><span class="tab-icon">👥</span>Client CRM</div>
+  <div class="tab" onclick="showPage('inventory',this)"><span class="tab-icon">🏡</span>Properties</div>
+  <div class="tab" onclick="showPage('templates',this)"><span class="tab-icon">💬</span>Message Templates</div>
+  <div class="tab" onclick="showPage('kanban',this)"><span class="tab-icon">📊</span>Kanban Pipeline</div>
+  <div class="tab" onclick="showPage('tanks',this)"><span class="tab-icon">🌿</span>Tank Projects</div>
+</div>
+
+<div class="content">
+
+<!-- ════════════════════════════════════════
+     PAGE 1: DAILY PLANNER
+════════════════════════════════════════ -->
+<div class="page active" id="page-planner">
+  <div class="planner-greeting">
+    <div class="greeting-line" id="greeting-line">Good morning</div>
+    <div class="greeting-sub">Here's your briefing for today</div>
+    <div class="date-badge" id="date-badge">📅 Loading…</div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="weather-bar">
+    <div class="weather-icon" id="w-icon">⛅</div>
+    <div>
+      <div class="weather-temp" id="w-temp">—</div>
+      <div class="weather-details">
+        <div class="weather-loc">Koh Samui, Surat Thani</div>
+        <div class="weather-desc" id="w-desc">Loading weather…</div>
+        <div class="weather-extra">
+          <span class="we" id="w-humidity">💧 —</span>
+          <span class="we" id="w-wind">💨 —</span>
+          <span class="we" id="w-uv">☀️ —</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="briefing-grid" id="briefing-grid">
+    <div class="brief-card">
+      <div class="bc-icon">📋</div>
+      <div class="bc-label">Open Tasks</div>
+      <div class="bc-val" id="bc-tasks">—</div>
+      <div class="bc-sub" id="bc-tasks-sub">Loading…</div>
+    </div>
+    <div class="brief-card">
+      <div class="bc-icon">⚠️</div>
+      <div class="bc-label">Overdue Tasks</div>
+      <div class="bc-val warn" id="bc-overdue">—</div>
+      <div class="bc-sub" id="bc-overdue-sub"></div>
+    </div>
+    <div class="brief-card">
+      <div class="bc-icon">👥</div>
+      <div class="bc-label">Active Clients</div>
+      <div class="bc-val gold" id="bc-clients">—</div>
+      <div class="bc-sub" id="bc-clients-sub"></div>
+    </div>
+    <div class="brief-card">
+      <div class="bc-icon">🏡</div>
+      <div class="bc-label">Properties</div>
+      <div class="bc-val ok" id="bc-props">—</div>
+      <div class="bc-sub" id="bc-props-sub"></div>
+    </div>
+    <div class="brief-card">
+      <div class="bc-icon">📊</div>
+      <div class="bc-label">Pipeline Deals</div>
+      <div class="bc-val gold" id="bc-deals">—</div>
+      <div class="bc-sub" id="bc-deals-sub"></div>
+    </div>
+    <div class="brief-card">
+      <div class="bc-icon">💰</div>
+      <div class="bc-label">Transactions</div>
+      <div class="bc-val ok" id="bc-txns">—</div>
+      <div class="bc-sub" id="bc-txns-sub"></div>
+    </div>
+  </div>
+
+  <!-- TODAY'S AGENDA -->
+  <div class="section-title">📅 Today's Agenda <span id="today-count"></span></div>
+  <div class="today-list" id="today-list"></div>
+
+  <!-- URGENT TASKS -->
+  <div class="section-title">🔴 Urgent Tasks <span id="urgent-count"></span></div>
+  <div class="today-list" id="urgent-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 2: CLIENT CRM
+════════════════════════════════════════ -->
+<div class="page" id="page-crm">
+  <div class="crm-toolbar">
+    <div class="search-box">
+      <span class="si">🔍</span>
+      <input type="text" id="crm-search" placeholder="Search clients by name, nationality, property…" oninput="renderClients()" />
+    </div>
+    <button class="btn-green" onclick="openClientModal()">+ Add Client</button>
+  </div>
+  <div class="filter-chips" id="crm-chips">
+    <div class="fchip active" onclick="setCrmFilter('all',this)">All</div>
+    <div class="fchip" onclick="setCrmFilter('viewing',this)">Viewing</div>
+    <div class="fchip" onclick="setCrmFilter('rental',this)">Rental</div>
+    <div class="fchip" onclick="setCrmFilter('sale',this)">Sale</div>
+    <div class="fchip" onclick="setCrmFilter('closed',this)">Closed</div>
+  </div>
+  <div class="clients-grid" id="clients-grid"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 3: PROPERTY INVENTORY
+════════════════════════════════════════ -->
+<div class="page" id="page-inventory">
+  <div class="crm-toolbar">
+    <div class="search-box">
+      <span class="si">🔍</span>
+      <input type="text" id="prop-search" placeholder="Search by name, location, owner…" oninput="renderProps()" />
+    </div>
+    <button class="btn-green" onclick="openPropModal()">+ Add Property</button>
+  </div>
+  <div class="filter-chips" id="prop-chips">
+    <div class="fchip active" onclick="setPropFilter('all',this)">All</div>
+    <div class="fchip" onclick="setPropFilter('available',this)">✅ Available</div>
+    <div class="fchip" onclick="setPropFilter('rented',this)">🏠 Rented</div>
+    <div class="fchip" onclick="setPropFilter('maintenance',this)">🔧 Maintenance</div>
+    <div class="fchip" onclick="setPropFilter('reserved',this)">⏳ Reserved</div>
+  </div>
+  <div class="props-grid" id="props-grid"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 4: MESSAGE TEMPLATES
+════════════════════════════════════════ -->
+<div class="page" id="page-templates">
+  <div class="templates-layout">
+    <div>
+      <div class="template-cats" id="template-cats"></div>
+    </div>
+    <div>
+      <div class="templates-list" id="templates-list"></div>
+      <div class="add-template-btn" onclick="openTemplateModal()">
+        ＋ Add custom template
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 5: KANBAN PIPELINE
+════════════════════════════════════════ -->
+<div class="page" id="page-kanban">
+  <div class="kanban-toolbar">
+    <h2>📊 Kanban Pipeline</h2>
+    <div class="kanban-summary">
+      <span class="ks-stat">Deals: <strong id="kb-total">0</strong></span>
+      <span class="ks-stat">Active: <strong id="kb-active">0</strong></span>
+      <span class="ks-stat">Value: <strong id="kb-value">—</strong></span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-green" onclick="openKCardModal(null,null)" style="font-size:12px;padding:7px 14px;">+ Add Deal</button>
+    </div>
+  </div>
+  <div class="kb-board" id="kb-board"></div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 6: TANK PROJECTS (K.YAI)
+════════════════════════════════════════ -->
+<div class="page" id="page-tanks">
+  <div class="tank-header">
+    <div>
+      <div class="tank-title">🌿 Tank Projects</div>
+      <div class="tank-sub">Long-term vision projects · K.Yai portfolio · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e98a81b68a868499888790a981869e9d868780829a8c87c78a8684">[email&#160;protected]</a></div>
+    </div>
+    <button class="btn-green" onclick="openTankModal()">+ Add Project</button>
+  </div>
+  <div class="tank-grid" id="tank-grid"></div>
+</div>
+
+</div><!-- end .content -->
+
+<!-- ── CLIENT MODAL ── -->
+<div class="modal-ov" id="client-modal">
+  <div class="modal-box">
+    <h3 id="client-modal-title">Add Client</h3>
+    <div class="m2col">
+      <div class="mrow"><label>Full Name *</label><input type="text" id="cm-name" placeholder="e.g. Farid Al-Hassan" /></div>
+      <div class="mrow"><label>Nationality</label><input type="text" id="cm-nat" placeholder="e.g. 🇷🇺 Russian" /></div>
+    </div>
+    <div class="m3col">
+      <div class="mrow"><label>Platform</label>
+        <select id="cm-platform"><option>Telegram</option><option>Line</option><option>Facebook</option><option>WhatsApp</option><option>Email</option><option>Call</option></select>
+      </div>
+      <div class="mrow"><label>Stage</label>
+        <select id="cm-stage"><option value="inquiry">Inquiry</option><option value="viewing">Viewing</option><option value="rental">Rental</option><option value="sale">Sale</option><option value="contract">Contract</option><option value="closed">Closed</option></select>
+      </div>
+      <div class="mrow"><label>Type</label>
+        <select id="cm-type"><option>Long-term</option><option>Short-term</option><option>Sale</option></select>
+      </div>
+    </div>
+    <div class="m2col">
+      <div class="mrow"><label>Budget / Rent</label><input type="text" id="cm-budget" placeholder="e.g. ฿45,000/mo" /></div>
+      <div class="mrow"><label>Phone / Contact</label><input type="text" id="cm-contact" placeholder="e.g. +66 89 xxx xxxx" /></div>
+    </div>
+    <div class="mrow"><label>Property Interest</label><input type="text" id="cm-property" placeholder="e.g. 3-bed sea view villa, Lamai" /></div>
+    <div class="mrow"><label>Notes</label><textarea id="cm-notes" placeholder="Requirements, preferences, history…" style="min-height:70px;resize:vertical;"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('client-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROPERTY MODAL ── -->
+<div class="modal-ov" id="prop-modal">
+  <div class="modal-box">
+    <h3 id="prop-modal-title">Add Property</h3>
+    <div class="m2col">
+      <div class="mrow"><label>Property Name *</label><input type="text" id="pm-name" placeholder="e.g. Sea View Villa, Lamai" /></div>
+      <div class="mrow"><label>Location / Area</label><input type="text" id="pm-location" placeholder="e.g. Lamai, Chaweng…" /></div>
+    </div>
+    <div class="m3col">
+      <div class="mrow"><label>Bedrooms</label><input type="number" id="pm-beds" min="0" placeholder="3" /></div>
+      <div class="mrow"><label>Bathrooms</label><input type="number" id="pm-baths" min="0" placeholder="2" /></div>
+      <div class="mrow"><label>Pool</label><select id="pm-pool"><option value="yes">✅ Yes</option><option value="no">❌ No</option><option value="shared">🏊 Shared</option></select></div>
+    </div>
+    <div class="m2col">
+      <div class="mrow"><label>Monthly Rate (฿)</label><input type="text" id="pm-rate" placeholder="e.g. ฿45,000/mo" /></div>
+      <div class="mrow"><label>Status</label>
+        <select id="pm-status"><option value="available">✅ Available</option><option value="rented">🏠 Rented</option><option value="maintenance">🔧 Maintenance</option><option value="reserved">⏳ Reserved</option></select>
+      </div>
+    </div>
+    <div class="m2col">
+      <div class="mrow"><label>Owner Name</label><input type="text" id="pm-owner" placeholder="Property owner" /></div>
+      <div class="mrow"><label>Owner Contact</label><input type="text" id="pm-owner-contact" placeholder="Phone / Line" /></div>
+    </div>
+    <div class="mrow"><label>Current Tenant (if rented)</label><input type="text" id="pm-tenant" placeholder="Tenant name" /></div>
+    <div class="mrow"><label>Notes / Amenities</label><textarea id="pm-notes" placeholder="AC, WiFi, parking, sea view, extras…" style="min-height:60px;resize:vertical;"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('prop-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveProp()">Save Property</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TEMPLATE MODAL ── -->
+<div class="modal-ov" id="template-modal">
+  <div class="modal-box">
+    <h3>Add Message Template</h3>
+    <div class="m2col">
+      <div class="mrow"><label>Template Title *</label><input type="text" id="tm-title" placeholder="e.g. Viewing Confirmation" /></div>
+      <div class="mrow"><label>Category</label>
+        <select id="tm-cat"><option>Viewing</option><option>Rental</option><option>Payment</option><option>Follow-up</option><option>Contract</option><option>Maintenance</option><option>General</option></select>
+      </div>
+    </div>
+    <div class="mrow"><label>English Message</label><textarea id="tm-en" placeholder="English version…" style="min-height:80px;resize:vertical;"></textarea></div>
+    <div class="mrow"><label>Thai Message (ภาษาไทย)</label><textarea id="tm-th" placeholder="ภาษาไทย…" style="min-height:80px;resize:vertical;"></textarea></div>
+    <div class="mrow"><label>Russian Message (Русский)</label><textarea id="tm-ru" placeholder="Русский…" style="min-height:80px;resize:vertical;"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('template-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveTemplate()">Save Template</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── KANBAN CARD MODAL ── -->
+<div class="modal-ov" id="kcard-modal">
+  <div class="modal-box">
+    <h3 id="kcard-modal-title">Add Deal</h3>
+    <div class="m2col">
+      <div class="mrow"><label>Client Name *</label><input type="text" id="kc-client" placeholder="e.g. Farid" /></div>
+      <div class="mrow"><label>Property</label><input type="text" id="kc-property" placeholder="e.g. Sea View Villa" /></div>
+    </div>
+    <div class="m3col">
+      <div class="mrow"><label>Stage</label>
+        <select id="kc-stage">
+          <option value="inquiry">🔍 Inquiry</option>
+          <option value="viewing">📅 Viewing</option>
+          <option value="negotiation">💬 Negotiation</option>
+          <option value="contract">📝 Contract</option>
+          <option value="rental">🏡 Rental</option>
+          <option value="maintenance">🔧 Maintenance</option>
+          <option value="closed">✅ Closed</option>
+        </select>
+      </div>
+      <div class="mrow"><label>Deal Type</label>
+        <select id="kc-type">
+          <option>Long-term</option><option>Short-term</option><option>Sale</option>
+        </select>
+      </div>
+      <div class="mrow"><label>Platform</label>
+        <select id="kc-platform">
+          <option>Telegram</option><option>Facebook</option><option>Line</option>
+          <option>WhatsApp</option><option>Email</option><option>Call</option>
+        </select>
+      </div>
+    </div>
+    <div class="m2col">
+      <div class="mrow"><label>Budget / Price</label><input type="text" id="kc-price" placeholder="e.g. ฿45,000/mo" /></div>
+      <div class="mrow"><label>Contact</label><input type="text" id="kc-contact" placeholder="Phone / username" /></div>
+    </div>
+    <div class="mrow"><label>Notes</label><textarea id="kc-notes" placeholder="Requirements, timeline, observations…" style="min-height:65px;resize:vertical;"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('kcard-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveKCard()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+let clients  = JSON.parse(localStorage.getItem('samui_crm') || 'null');
+let props    = JSON.parse(localStorage.getItem('samui_props') || 'null');
+let templates= JSON.parse(localStorage.getItem('samui_templates') || 'null');
+
+if(!clients) {
+  clients = [
+    {id:1001,name:'Farid',nat:'🇦🇪 Arab',platform:'Facebook',stage:'viewing',type:'Sale',budget:'฿2,400,000',contact:'Facebook Messenger',property:'2 Bed / 1 Bath villa',notes:'Viewing 2 Mar 10:00 AM. Source: Facebook.',lastContact:'2026-03-01',created:'2026-03-01'},
+    {id:1002,name:'Sergei Volkov',nat:'🇷🇺 Russian',platform:'Telegram',stage:'viewing',type:'Long-term',budget:'฿120,000/mo',contact:'Telegram',property:'Sea View Villa, Lamai',notes:'Wants 3-bed, sea view, pool. Budget flexible.',lastContact:'2026-03-01',created:'2026-02-28'},
+    {id:1003,name:'Emma Johansson',nat:'🇸🇪 Swedish',platform:'Email',stage:'rental',type:'Long-term',budget:'฿45,000/mo',contact:'emma@email.com',property:'Mae Nam Beach House',notes:'6-month contract signed. Very reliable.',lastContact:'2026-02-25',created:'2026-01-15'},
+    {id:1004,name:'Anna Mueller',nat:'🇩🇪 German',platform:'Line',stage:'sale',type:'Sale',budget:'฿18,000,000',contact:'Line',property:'Bophut Pool Villa',notes:'Serious buyer. 2nd viewing done. Negotiate.',lastContact:'2026-02-28',created:'2026-02-10'},
+  ];
+  saveClients();
+}
+
+if(!props) {
+  props = [
+    {id:2001,name:'Sea View Villa',location:'Lamai',beds:3,baths:2,pool:'yes',rate:'฿120,000/mo',status:'available',owner:'คุณสมชาย',ownerContact:'089-xxx-xxxx',tenant:'',notes:'Sea view, private pool, 2 floors, modern style.',emoji:'🏖️'},
+    {id:2002,name:'Mae Nam Beach House',location:'Mae Nam',beds:2,baths:2,pool:'no',rate:'฿45,000/mo',status:'rented',owner:'คุณวิไล',ownerContact:'081-xxx-xxxx',tenant:'Emma Johansson',notes:'Beachfront, garden, 2-min walk to beach.',emoji:'🌊'},
+    {id:2003,name:'Chaweng Hilltop Villa',location:'Chaweng',beds:4,baths:3,pool:'yes',rate:'฿180,000/mo',status:'available',owner:'คุณประเสริฐ',ownerContact:'086-xxx-xxxx',tenant:'',notes:'360° sea view, infinity pool, premium finish.',emoji:'⛰️'},
+    {id:2004,name:'Bophut Pool Villa',location:'Bophut',beds:3,baths:2,pool:'yes',rate:'฿85,000/mo',status:'rented',owner:'คุณนิดา',ownerContact:'085-xxx-xxxx',tenant:'Ongoing listing',notes:'Traditional Thai style, private pool, near Fisherman\'s Village.',emoji:'🏡'},
+    {id:2005,name:'Lamai Garden House',location:'Lamai',beds:2,baths:1,pool:'no',rate:'฿25,000/mo',status:'maintenance',owner:'คุณอนุชา',ownerContact:'087-xxx-xxxx',tenant:'',notes:'AC servicing and repainting in progress.',emoji:'🔧'},
+    {id:2007,name:'3-Storey Building Thaledi',location:'Thaledi (Near Airport)',beds:4,baths:3,pool:'no',rate:'฿30,000/mo',status:'available',owner:'Thapanakorn Koch',ownerContact:'Line: attract168',tenant:'',notes:'3-storey commercial building · 3 units total · 4 new AC units · Land 20 ตร.วา (~80 sqm) · Open ground floor multi-use · On main Thaledi road · Near Samui Airport · Min 6-month contract · Sale price ฿4,500,000 · Good for investment/rental income.',emoji:'🏢'},
+    {id:2006,name:'Chaweng Noi Mountain View House',location:'Chaweng Noi',beds:1,baths:1,pool:'no',rate:'฿15,000/mo',status:'available',owner:'Aom Sangsuriya',ownerContact:'WhatsApp +66689994721',tenant:'',notes:'Mountain view, near PBISS school. Short-term <1yr: ฿17,000/mo. Long-term 1yr+: ฿15,000/mo. Deposit: ฿10,000. Electric ฿8/unit, Water ฿200/person/month, Exit cleaning ฿700. No pets. Available NOW.',emoji:'⛰️'},
+  ];
+  saveProps();
+}
+
+if(!templates) {
+  templates = [
+    {id:3001,title:'Viewing Confirmation',cat:'Viewing',
+     en:`Hello [Client Name],\n\nThis is to confirm your property viewing:\n📍 Property: [Property Name]\n📅 Date: [Date]\n⏰ Time: [Time]\n\nPlease let me know if you need directions. Looking forward to meeting you!\n\nBest regards,\nSamui PM`,
+     th:`สวัสดีค่ะ คุณ[ชื่อลูกค้า]\n\nขอยืนยันนัดชมอสังหาริมทรัพย์:\n📍 ทรัพย์สิน: [ชื่อทรัพย์สิน]\n📅 วันที่: [วันที่]\n⏰ เวลา: [เวลา]\n\nหากต้องการแผนที่หรือข้อมูลเพิ่มเติม กรุณาแจ้งได้เลยค่ะ\n\nขอบคุณค่ะ\nSamui PM`,
+     ru:`Здравствуйте, [Имя клиента]!\n\nПодтверждаем просмотр объекта:\n📍 Объект: [Название]\n📅 Дата: [Дата]\n⏰ Время: [Время]\n\nЕсли нужны инструкции по дороге — напишите! Будем рады встрече.\n\nС уважением,\nSamui PM`},
+    {id:3002,title:'Rent Payment Reminder',cat:'Payment',
+     en:`Dear [Tenant Name],\n\nThis is a friendly reminder that your rent payment of [Amount] for [Property] is due on [Due Date].\n\nBank: SCB\nAccount: xxx-xxx941-2\n\nPlease confirm once transferred. Thank you!`,
+     th:`เรียน คุณ[ชื่อผู้เช่า]\n\nขอแจ้งเตือนค่าเช่า [จำนวนเงิน] สำหรับ[ชื่อทรัพย์สิน] ครบกำหนดชำระวันที่ [วันที่]\n\nธนาคาร: SCB\nเลขบัญชี: xxx-xxx941-2\n\nกรุณาแจ้งเมื่อโอนเงินเรียบร้อยแล้วนะคะ ขอบคุณค่ะ`,
+     ru:`Уважаемый(ая) [Имя арендатора],\n\nНапоминаем об оплате аренды [Сумма] за [Объект] до [Дата].\n\nБанк: SCB\nСчёт: xxx-xxx941-2\n\nПожалуйста, подтвердите перевод. Спасибо!`},
+    {id:3003,title:'Late Payment Notice',cat:'Payment',
+     en:`Dear [Tenant Name],\n\nWe notice that your rent payment of [Amount] for [Month] is now [X] days overdue.\n\nPlease arrange payment as soon as possible to avoid any disruption to your tenancy.\n\nIf you have any difficulties, please contact us immediately so we can assist.\n\nThank you for your prompt attention.`,
+     th:`เรียน คุณ[ชื่อผู้เช่า]\n\nค่าเช่าจำนวน [จำนวนเงิน] ประจำเดือน[เดือน] เกินกำหนดชำระ [X] วันแล้ว\n\nกรุณาชำระโดยเร็วที่สุด หากมีปัญหาใดๆ โปรดติดต่อเราค่ะ\n\nขอบคุณค่ะ`,
+     ru:`Уважаемый(ая) [Имя],\n\nОплата аренды [Сумма] за [Месяц] просрочена на [X] дней.\n\nПросим оплатить как можно скорее. Если есть трудности — свяжитесь с нами немедленно.\n\nСпасибо.`},
+    {id:3004,title:'Post-Viewing Follow-up',cat:'Follow-up',
+     en:`Hi [Client Name],\n\nThank you for visiting [Property Name] today! It was great to meet you.\n\nIf you have any questions or would like to arrange a second viewing, please don't hesitate to reach out.\n\nWe also have other properties that may match your criteria — happy to share options if you're interested.\n\nLooking forward to hearing from you!`,
+     th:`สวัสดีค่ะ คุณ[ชื่อ]\n\nขอบคุณที่มาชม[ชื่อทรัพย์สิน]วันนี้ค่ะ ยินดีที่ได้พบคุณ\n\nหากมีคำถามหรืออยากนัดชมครั้งที่สอง ติดต่อได้เลยนะคะ\n\nมีทรัพย์สินอื่นที่น่าสนใจอีก ยินดีแนะนำค่ะ`,
+     ru:`Здравствуйте, [Имя]!\n\nСпасибо за визит на объект [Название] сегодня!\n\nЕсли есть вопросы или хотите второй просмотр — пишите! У нас также есть другие варианты, которые могут вас заинтересовать.\n\nС нетерпением ждём ответа!`},
+    {id:3005,title:'Contract Ready to Sign',cat:'Contract',
+     en:`Dear [Client Name],\n\nYour rental agreement for [Property Name] is ready.\n\nPlease review the attached document and confirm:\n✅ Start date: [Date]\n✅ Monthly rent: [Amount]\n✅ Deposit: [Amount]\n\nKindly sign and return at your earliest convenience.\n\nThank you!`,
+     th:`เรียน คุณ[ชื่อ]\n\nสัญญาเช่า[ชื่อทรัพย์สิน]พร้อมแล้วค่ะ\n\nกรุณาตรวจสอบเอกสารและยืนยัน:\n✅ วันเริ่มต้น: [วันที่]\n✅ ค่าเช่า: [จำนวน]\n✅ เงินประกัน: [จำนวน]\n\nกรุณาลงนามและส่งกลับโดยเร็วที่สุด ขอบคุณค่ะ`,
+     ru:`Уважаемый(ая) [Имя],\n\nДоговор аренды [Объект] готов к подписанию.\n\nПожалуйста, проверьте документ:\n✅ Дата начала: [Дата]\n✅ Аренда: [Сумма]\n✅ Депозит: [Сумма]\n\nПодпишите и верните при первой возможности. Спасибо!`},
+    {id:3006,title:'Maintenance Update',cat:'Maintenance',
+     en:`Dear [Tenant Name],\n\nWe wanted to update you on the maintenance request for [Issue].\n\nStatus: [In Progress / Completed]\nScheduled: [Date]\nTechnician: [Name/Company]\n\nThank you for your patience. Please contact us if you have any further concerns.`,
+     th:`เรียน คุณ[ชื่อ]\n\nขอแจ้งความคืบหน้าการซ่อมบำรุง [ปัญหา]\n\nสถานะ: [กำลังดำเนินการ / เสร็จสิ้น]\nกำหนดการ: [วันที่]\nช่าง: [ชื่อ]\n\nขอบคุณสำหรับความอดทนค่ะ`,
+     ru:`Уважаемый(ая) [Имя],\n\nОбновление по заявке на ремонт: [Проблема].\n\nСтатус: [В работе / Выполнено]\nДата: [Дата]\nМастер: [Имя]\n\nСпасибо за терпение!`},
+  ];
+  saveTemplates();
+}
+
+function saveClients(){  localStorage.setItem('samui_crm',       JSON.stringify(clients)); }
+function saveProps(){    localStorage.setItem('samui_props',      JSON.stringify(props)); }
+function saveTemplates(){localStorage.setItem('samui_templates',  JSON.stringify(templates)); }
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let crmFilter='all', propFilter='all', activeTCat='all', openTemplateId=null, openTemplateLang={};
+let editingClientId=null, editingPropId=null;
+
+// ─── CLOCK ──────────────────────────────────────────────────────────────────
+function updateClock(){
+  const now=new Date();
+  document.getElementById('header-time').textContent = now.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock,30000);
+
+// ─── PAGE SWITCHING ─────────────────────────────────────────────────────────
+function showPage(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  tab.classList.add('active');
+  if(id==='planner') buildPlanner();
+  if(id==='crm')     renderClients();
+  if(id==='inventory') renderProps();
+  if(id==='templates') renderTemplates();
+  if(id==='kanban') renderKanban();
+  if(id==='tanks') renderTanks();
+}
+
+// ─── PLANNER ────────────────────────────────────────────────────────────────
+function buildPlanner(){
+  const now=new Date();
+  const hour=now.getHours();
+  const greet = hour<12?'Good morning ☀️':hour<17?'Good afternoon 🌤️':'Good evening 🌙';
+  document.getElementById('greeting-line').textContent=greet;
+  document.getElementById('date-badge').innerHTML='📅 '+now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Stats from localStorage
+  const tasks   = JSON.parse(localStorage.getItem('samui_pm_v2')||'[]');
+  const deals   = JSON.parse(localStorage.getItem('samui_pm_pipeline')||'[]');
+  const txns    = JSON.parse(localStorage.getItem('samui_pm_finance')||'[]');
+  const today   = now.toISOString().split('T')[0];
+  const openT   = tasks.filter(t=>!t.done);
+  const overdueT= tasks.filter(t=>!t.done&&t.due&&t.due<today);
+  const availP  = props.filter(p=>p.status==='available').length;
+  const rentedP = props.filter(p=>p.status==='rented').length;
+  const activeD = deals.filter(d=>d.stage!=='closed').length;
+
+  document.getElementById('bc-tasks').textContent    = openT.length;
+  document.getElementById('bc-tasks-sub').textContent= openT.length+' requiring attention';
+  document.getElementById('bc-overdue').textContent  = overdueT.length;
+  document.getElementById('bc-overdue-sub').textContent = overdueT.length>0?'Need immediate action':'All on track ✓';
+  document.getElementById('bc-clients').textContent  = clients.length;
+  document.getElementById('bc-clients-sub').textContent= clients.filter(c=>c.stage!=='closed').length+' active';
+  document.getElementById('bc-props').textContent    = props.length;
+  document.getElementById('bc-props-sub').textContent= availP+' available · '+rentedP+' rented';
+  document.getElementById('bc-deals').textContent    = activeD;
+  document.getElementById('bc-deals-sub').textContent= deals.length+' total in pipeline';
+  document.getElementById('bc-txns').textContent     = txns.length;
+  document.getElementById('bc-txns-sub').textContent = 'All time records';
+
+  // Today's agenda: tasks due today + viewings + payments
+  const todayItems=[];
+  tasks.filter(t=>!t.done&&t.due===today).forEach(t=>{
+    todayItems.push({icon:'📋',title:t.title,meta:(t.client?'👤 '+t.client+' · ':'')+t.cat,time:'',type:t.prio==='high'?'urgent':'task'});
+  });
+  clients.filter(c=>c.stage==='viewing').forEach(c=>{
+    todayItems.push({icon:'📅',title:'Viewing — '+c.name,meta:c.property||'',time:'10:00',type:'viewing'});
+  });
+  const tl=document.getElementById('today-list');
+  document.getElementById('today-count').textContent='('+todayItems.length+')';
+  tl.innerHTML = todayItems.length
+    ? todayItems.map(i=>`<div class="today-item ${i.type}"><div class="ti-icon">${i.icon}</div><div class="ti-body"><div class="ti-title">${esc(i.title)}</div><div class="ti-meta">${esc(i.meta)}</div></div><div class="ti-time">${i.time}</div></div>`).join('')
+    : '<div class="empty-day"><div class="ei">🌴</div>Nothing scheduled — enjoy the day!</div>';
+
+  // Urgent tasks
+  const urg=tasks.filter(t=>!t.done&&t.prio==='high').slice(0,6);
+  const ul=document.getElementById('urgent-list');
+  document.getElementById('urgent-count').textContent='('+urg.length+')';
+  ul.innerHTML = urg.length
+    ? urg.map(t=>`<div class="today-item urgent"><div class="ti-icon">🔴</div><div class="ti-body"><div class="ti-title">${esc(t.title)}</div><div class="ti-meta">${t.client?'👤 '+esc(t.client)+' · ':''} ${esc(t.cat)} ${t.due?'· Due '+fmtDate(t.due):''}</div></div></div>`).join('')
+    : '<div class="empty-day"><div class="ei">✅</div>No urgent tasks!</div>';
+
+  // Weather (Open-Meteo, free, no API key)
+  fetchWeather();
+}
+
+async function fetchWeather(){
+  try{
+    // Koh Samui coords: 9.5018, 100.0136
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=9.5018&longitude=100.0136&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&timezone=Asia%2FBangkok');
+    const d=await r.json();
+    const c=d.current;
+    const wc=c.weathercode;
+    const icons={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️'};
+    const descs={0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Snow',80:'Showers',81:'Heavy showers',82:'Violent showers',95:'Thunderstorm'};
+    document.getElementById('w-icon').textContent = icons[wc]||'🌡️';
+    document.getElementById('w-temp').textContent = Math.round(c.temperature_2m)+'°C';
+    document.getElementById('w-desc').textContent = descs[wc]||'';
+    document.getElementById('w-humidity').textContent = '💧 '+c.relativehumidity_2m+'%';
+    document.getElementById('w-wind').textContent = '💨 '+Math.round(c.windspeed_10m)+' km/h';
+    document.getElementById('w-uv').textContent   = '☀️ Tropical';
+  }catch(e){
+    document.getElementById('w-desc').textContent='Weather unavailable';
+  }
+}
+
+// ─── CRM ────────────────────────────────────────────────────────────────────
+const avatarColors=['#1a4a3a','#2d3a1a','#3a1a2d','#1a2d3a','#2a1a3a','#3a2a1a'];
+
+function renderClients(){
+  const q=(document.getElementById('crm-search').value||'').toLowerCase();
+  let list=[...clients];
+  if(crmFilter!=='all') list=list.filter(c=>c.stage===crmFilter);
+  if(q) list=list.filter(c=>[c.name,c.nat,c.property,c.notes].join(' ').toLowerCase().includes(q));
+  const g=document.getElementById('clients-grid');
+  if(!list.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">No clients found.</div>';return;}
+  g.innerHTML=list.map(c=>{
+    const initials=c.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const col=avatarColors[c.id%avatarColors.length];
+    return `<div class="client-card" onclick="openClientModal(${c.id})">
+      <div class="edit-overlay">
+        <button class="icon-btn del" onclick="event.stopPropagation();deleteClient(${c.id})">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div class="client-avatar" style="background:${col};color:var(--sand);">${initials}</div>
+        <div>
+          <div class="client-name">${esc(c.name)}</div>
+          <div class="client-nat">${esc(c.nat||'—')}</div>
+        </div>
+      </div>
+      <div class="client-meta">
+        <span class="cmeta cm-platform">${esc(c.platform||'—')}</span>
+        <span class="cmeta cm-stage">${c.stage||'inquiry'}</span>
+        <span class="cmeta cm-type">${esc(c.type||'')}</span>
+        ${c.budget?`<span class="cmeta cm-budget">${esc(c.budget)}</span>`:''}
+      </div>
+      ${c.property?`<div style="font-size:12px;color:var(--muted);margin-top:8px;">🏡 ${esc(c.property)}</div>`:''}
+      ${c.notes?`<div style="font-size:11.5px;color:var(--muted2);margin-top:5px;line-height:1.4;">${esc(c.notes).substring(0,80)}${c.notes.length>80?'…':''}</div>`:''}
+      <div class="client-last">Last contact: ${c.lastContact||'—'} · Added ${c.created||'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function setCrmFilter(f,el){crmFilter=f;document.querySelectorAll('#crm-chips .fchip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderClients();}
+
+function openClientModal(id){
+  editingClientId=id||null;
+  document.getElementById('client-modal-title').textContent=id?'Edit Client':'Add Client';
+  const f=id?clients.find(c=>c.id===id):null;
+  document.getElementById('cm-name').value=f?.name||'';
+  document.getElementById('cm-nat').value=f?.nat||'';
+  document.getElementById('cm-platform').value=f?.platform||'Telegram';
+  document.getElementById('cm-stage').value=f?.stage||'inquiry';
+  document.getElementById('cm-type').value=f?.type||'Long-term';
+  document.getElementById('cm-budget').value=f?.budget||'';
+  document.getElementById('cm-contact').value=f?.contact||'';
+  document.getElementById('cm-property').value=f?.property||'';
+  document.getElementById('cm-notes').value=f?.notes||'';
+  openModal('client-modal');
+}
+
+function saveClient(){
+  const name=document.getElementById('cm-name').value.trim();
+  if(!name)return;
+  const data={name,nat:document.getElementById('cm-nat').value.trim(),platform:document.getElementById('cm-platform').value,stage:document.getElementById('cm-stage').value,type:document.getElementById('cm-type').value,budget:document.getElementById('cm-budget').value.trim(),contact:document.getElementById('cm-contact').value.trim(),property:document.getElementById('cm-property').value.trim(),notes:document.getElementById('cm-notes').value.trim(),lastContact:new Date().toISOString().split('T')[0]};
+  if(editingClientId){const c=clients.find(c=>c.id===editingClientId);if(c)Object.assign(c,data);}
+  else{clients.unshift({id:Date.now(),...data,created:new Date().toISOString().split('T')[0]});}
+  saveClients();closeModal('client-modal');renderClients();toast('Client saved ✓');
+}
+
+function deleteClient(id){if(confirm('Delete this client?')){clients=clients.filter(c=>c.id!==id);saveClients();renderClients();}}
+
+// ─── PROPERTIES ──────────────────────────────────────────────────────────────
+function renderProps(){
+  const q=(document.getElementById('prop-search').value||'').toLowerCase();
+  let list=[...props];
+  if(propFilter!=='all') list=list.filter(p=>p.status===propFilter);
+  if(q) list=list.filter(p=>[p.name,p.location,p.owner,p.notes,p.tenant].join(' ').toLowerCase().includes(q));
+  const g=document.getElementById('props-grid');
+  if(!list.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">No properties found.</div>';return;}
+  const sMap={available:'ps-available',rented:'ps-rented',maintenance:'ps-maintenance',reserved:'ps-reserved'};
+  const sLabel={available:'Available',rented:'Rented',maintenance:'Maintenance',reserved:'Reserved'};
+  g.innerHTML=list.map(p=>`<div class="prop-card" onclick="openPropModal(${p.id})">
+    <div class="prop-thumb">
+      ${p.emoji||'🏡'}
+      <span class="prop-status-badge ${sMap[p.status]||'ps-available'}">${sLabel[p.status]||p.status}</span>
+    </div>
+    <div class="prop-body">
+      <div class="prop-name">${esc(p.name)}</div>
+      <div class="prop-location">📍 ${esc(p.location||'Koh Samui')}</div>
+      <div class="prop-specs">
+        <span class="spec">🛏 ${p.beds||'—'}</span>
+        <span class="spec">🚿 ${p.baths||'—'}</span>
+        <span class="spec">${p.pool==='yes'?'🏊 Pool':p.pool==='shared'?'🏊 Shared':'—'}</span>
+      </div>
+      <div><div class="prop-rate">${esc(p.rate||'—')}</div><div class="prop-rate-label">per month</div></div>
+      ${p.tenant?`<div class="prop-owner">👤 Tenant: ${esc(p.tenant)}</div>`:`<div class="prop-owner">👑 Owner: ${esc(p.owner||'—')}</div>`}
+      ${p.notes?`<div style="font-size:11.5px;color:var(--muted2);margin-top:6px;line-height:1.4;">${esc(p.notes).substring(0,70)}${p.notes.length>70?'…':''}</div>`:''}
+      <div class="prop-actions">
+        <div class="pa-btn" onclick="event.stopPropagation();openPropModal(${p.id})">✏️ Edit</div>
+        <div class="pa-btn" onclick="event.stopPropagation();deleteProp(${p.id})">✕ Remove</div>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+function setPropFilter(f,el){propFilter=f;document.querySelectorAll('#prop-chips .fchip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderProps();}
+
+function openPropModal(id){
+  editingPropId=id||null;
+  document.getElementById('prop-modal-title').textContent=id?'Edit Property':'Add Property';
+  const p=id?props.find(p=>p.id===id):null;
+  document.getElementById('pm-name').value=p?.name||'';
+  document.getElementById('pm-location').value=p?.location||'';
+  document.getElementById('pm-beds').value=p?.beds||'';
+  document.getElementById('pm-baths').value=p?.baths||'';
+  document.getElementById('pm-pool').value=p?.pool||'yes';
+  document.getElementById('pm-rate').value=p?.rate||'';
+  document.getElementById('pm-status').value=p?.status||'available';
+  document.getElementById('pm-owner').value=p?.owner||'';
+  document.getElementById('pm-owner-contact').value=p?.ownerContact||'';
+  document.getElementById('pm-tenant').value=p?.tenant||'';
+  document.getElementById('pm-notes').value=p?.notes||'';
+  openModal('prop-modal');
+}
+
+function saveProp(){
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name)return;
+  const data={name,location:document.getElementById('pm-location').value.trim(),beds:document.getElementById('pm-beds').value,baths:document.getElementById('pm-baths').value,pool:document.getElementById('pm-pool').value,rate:document.getElementById('pm-rate').value.trim(),status:document.getElementById('pm-status').value,owner:document.getElementById('pm-owner').value.trim(),ownerContact:document.getElementById('pm-owner-contact').value.trim(),tenant:document.getElementById('pm-tenant').value.trim(),notes:document.getElementById('pm-notes').value.trim(),emoji:['🏡','🏖️','🌊','⛰️','🏘️','🌴'][Math.floor(Math.random()*6)]};
+  if(editingPropId){const p=props.find(p=>p.id===editingPropId);if(p)Object.assign(p,data);}
+  else{props.unshift({id:Date.now(),...data});}
+  saveProps();closeModal('prop-modal');renderProps();toast('Property saved ✓');
+}
+
+function deleteProp(id){if(confirm('Remove this property?')){props=props.filter(p=>p.id!==id);saveProps();renderProps();}}
+
+// ─── TEMPLATES ────────────────────────────────────────────────────────────────
+const TCATS=['All','Viewing','Rental','Payment','Follow-up','Contract','Maintenance','General'];
+
+function renderTemplates(){
+  // Category sidebar
+  const cats=document.getElementById('template-cats');
+  cats.innerHTML=TCATS.map(cat=>{
+    const count=cat==='All'?templates.length:templates.filter(t=>t.cat===cat).length;
+    return `<div class="tcat ${activeTCat===cat.toLowerCase()||activeTCat===cat?'active':''}" onclick="setTCat('${cat}',this)">
+      <span>${catIcon(cat)} ${cat}</span>
+      <span class="tcat-count">${count}</span>
+    </div>`;
+  }).join('');
+
+  // Templates list
+  const q=activeTCat==='All'||activeTCat==='all'?templates:templates.filter(t=>t.cat===activeTCat||t.cat.toLowerCase()===activeTCat.toLowerCase());
+  const list=document.getElementById('templates-list');
+  list.innerHTML=q.map(t=>{
+    const isOpen=openTemplateId===t.id;
+    const lang=openTemplateLang[t.id]||'en';
+    const msg=t[lang]||'—';
+    return `<div class="template-item">
+      <div class="ti-header" onclick="toggleTemplate(${t.id})">
+        <span style="font-size:16px;">${catIcon(t.cat)}</span>
+        <span class="ti-title-text">${esc(t.title)}</span>
+        <div class="ti-lang-badges">
+          ${t.en?'<span class="lang-badge lb-en">EN</span>':''}
+          ${t.th?'<span class="lang-badge lb-th">TH</span>':''}
+          ${t.ru?'<span class="lang-badge lb-ru">RU</span>':''}
+        </div>
+        <span style="color:var(--muted);font-size:13px;margin-left:6px;">${isOpen?'▲':'▼'}</span>
+      </div>
+      <div class="ti-body-content ${isOpen?'open':''}">
+        <div class="lang-tabs">
+          ${t.en?`<button class="ltab ${lang==='en'?'active':''}" onclick="setLang(${t.id},'en',this)">🇬🇧 English</button>`:''}
+          ${t.th?`<button class="ltab ${lang==='th'?'active':''}" onclick="setLang(${t.id},'th',this)">🇹🇭 Thai</button>`:''}
+          ${t.ru?`<button class="ltab ${lang==='ru'?'active':''}" onclick="setLang(${t.id},'ru',this)">🇷🇺 Russian</button>`:''}
+        </div>
+        <div class="message-box" id="msgbox-${t.id}">${esc(msg)}</div>
+        <div class="template-actions">
+          <button class="btn-copy" id="copy-btn-${t.id}" onclick="copyTemplate(${t.id})">📋 Copy</button>
+          <div class="share-btns">
+            <button class="sbtn" onclick="shareTemplate(${t.id},'telegram')">📲 Telegram</button>
+            <button class="sbtn" onclick="shareTemplate(${t.id},'line')">💬 Line</button>
+            <button class="sbtn" onclick="deleteTemplate(${t.id})">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function catIcon(cat){const m={Viewing:'📅',Rental:'🏡',Payment:'💰',Followup:'🔄','Follow-up':'🔄',Contract:'📝',Maintenance:'🔧',General:'💬',All:'📋'};return m[cat]||'💬';}
+
+function setTCat(cat,el){activeTCat=cat;document.querySelectorAll('.tcat').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderTemplates();}
+function toggleTemplate(id){openTemplateId=openTemplateId===id?null:id;renderTemplates();}
+function setLang(id,lang,el){openTemplateLang[id]=lang;renderTemplates();}
+
+function copyTemplate(id){
+  const t=templates.find(t=>t.id===id);if(!t)return;
+  const lang=openTemplateLang[id]||'en';
+  navigator.clipboard.writeText(t[lang]||'').then(()=>{
+    const btn=document.getElementById('copy-btn-'+id);
+    if(btn){btn.textContent='✅ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied');},2000);}
+  });
+}
+
+function shareTemplate(id,platform){
+  const t=templates.find(t=>t.id===id);if(!t)return;
+  const lang=openTemplateLang[id]||'en';
+  const text=encodeURIComponent(t[lang]||'');
+  const urls={telegram:`https://t.me/share/url?text=${text}`,line:`https://line.me/R/share?text=${text}`};
+  window.open(urls[platform],'_blank');
+}
+
+function deleteTemplate(id){if(confirm('Delete this template?')){templates=templates.filter(t=>t.id!==id);saveTemplates();renderTemplates();}}
+
+function openTemplateModal(){openModal('template-modal');}
+function saveTemplate(){
+  const title=document.getElementById('tm-title').value.trim();
+  if(!title)return;
+  templates.unshift({id:Date.now(),title,cat:document.getElementById('tm-cat').value,en:document.getElementById('tm-en').value.trim(),th:document.getElementById('tm-th').value.trim(),ru:document.getElementById('tm-ru').value.trim()});
+  saveTemplates();closeModal('template-modal');renderTemplates();toast('Template saved ✓');
+  ['tm-title','tm-en','tm-th','tm-ru'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ─── MODAL HELPERS ───────────────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); editingClientId=null; editingPropId=null; }
+document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg){
+  let t=document.getElementById('toast');if(t)t.remove();
+  t=document.createElement('div');t.id='toast';t.textContent=msg;document.body.appendChild(t);
+  clearTimeout(t._t);t._t=setTimeout(()=>t.remove(),3000);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtDate(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+buildPlanner();
+renderKanban();
+// ═══════════════════════════════════════════
+// TANK PROJECTS DATA + LOGIC
+// ═══════════════════════════════════════════
+let tanks = JSON.parse(localStorage.getItem('samui_tanks') || 'null');
+if(!tanks) {
+  tanks = [
+    {
+      id:8001,
+      name:'Empty Space',
+      status:'planning',
+      cat:'Creative Wellness',
+      revenue:'฿250,000–300,000+/mo',
+      location:'Koh Samui',
+      vision:'Transform from Craft Shop to "Creative Wellness Sanctuary" — Evening Conscious Experience Studio targeting Executive Burnout and Luxury Travelers aged 35-60 who want to Reset their lives through mindful creative experiences.',
+      milestones:'Year 1: Build Community & Brand\nYear 2: Premium Workshop & Collaboration\nYear 3: Pop-up Rituals & Resort Expansion',
+      notebook:'https://notebooklm.google.com/notebook/7bb7a62c-969f-4f3c-8a3a-adcc23505568',
+      notes:'Brand: Calm Creative House. Power of Silence. Sand / Warm White / Natural Wood tones. Instrumental/Jazz music. Revenue: Wellness Workshops 70%, Private Rituals 15%, Craft/Drink/Drop 15%. Break-even target: 6-12 months.',
+      created:'2026-03-02'
+    }
+  ];
+  saveTanks();
+}
+function saveTanks(){ localStorage.setItem('samui_tanks', JSON.stringify(tanks)); }
+let editingTankId = null;
+
+function renderTanks(){
+  const g = document.getElementById('tank-grid');
+  if(!g) return;
+  if(!tanks.length){ g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted);">No projects yet. Add your first tank project.</div>'; return; }
+  const statusLabel = {concept:'💡 Concept',planning:'📋 Planning',active:'🚀 Active',hold:'⏸ Hold',done:'✅ Done'};
+  const statusCls   = {concept:'tsb-concept',planning:'tsb-planning',active:'tsb-active',hold:'tsb-hold',done:'tsb-done'};
+  g.innerHTML = tanks.map(t => {
+    const miles = (t.milestones||'').split('\n').filter(Boolean);
+    return \`<div class="tank-card \${t.status||'concept'}">
+      <div class="tank-card-top">
+        <div class="tank-name">\${esc(t.name)}</div>
+        <span class="tank-status-badge \${statusCls[t.status]||'tsb-concept'}">\${statusLabel[t.status]||t.status}</span>
+      </div>
+      <div class="tank-cat">🏷 \${esc(t.cat||'General')} \${t.location?'· 📍'+esc(t.location):''}</div>
+      \${t.vision?'<div class="tank-vision">'+esc(t.vision).substring(0,160)+(t.vision.length>160?'…':'')+'</div>':''}
+      <div class="tank-stats">
+        <div class="tstat"><div class="tstat-label">Target Revenue</div><div class="tstat-val">\${esc(t.revenue||'—')}</div></div>
+        <div class="tstat"><div class="tstat-label">Added</div><div class="tstat-val">\${t.created||'—'}</div></div>
+      </div>
+      \${miles.length?'<div class="tank-milestones"><div class="tm-label">Roadmap</div>'+miles.map(m=>'<div class="tm-item">→ '+esc(m)+'</div>').join('')+'</div>':''}
+      <div class="tank-actions">
+        <div class="tank-btn" onclick="openTankModal(\${t.id})">✏️ Edit</div>
+        \${t.notebook?'<a class="tank-btn nb" href="'+esc(t.notebook)+'" target="_blank">📓 NotebookLM</a>':''}
+        <div class="tank-btn del" onclick="deleteTank(\${t.id})">✕</div>
+      </div>
+    </div>\`;
+  }).join('');
+}
+
+function openTankModal(id){
+  editingTankId = id||null;
+  document.getElementById('tank-modal-title').textContent = id?'Edit Project':'Add Tank Project';
+  const t = id ? tanks.find(t=>t.id===id) : null;
+  document.getElementById('tk-name').value      = t?.name||'';
+  document.getElementById('tk-status').value    = t?.status||'concept';
+  document.getElementById('tk-cat').value       = t?.cat||'';
+  document.getElementById('tk-revenue').value   = t?.revenue||'';
+  document.getElementById('tk-location').value  = t?.location||'';
+  document.getElementById('tk-vision').value    = t?.vision||'';
+  document.getElementById('tk-milestones').value= t?.milestones||'';
+  document.getElementById('tk-notebook').value  = t?.notebook||'';
+  document.getElementById('tk-notes').value     = t?.notes||'';
+  openModal('tank-modal');
+}
+
+function saveTank(){
+  const name = document.getElementById('tk-name').value.trim();
+  if(!name) return;
+  const data = {
+    name, status:document.getElementById('tk-status').value,
+    cat:document.getElementById('tk-cat').value.trim(),
+    revenue:document.getElementById('tk-revenue').value.trim(),
+    location:document.getElementById('tk-location').value.trim(),
+    vision:document.getElementById('tk-vision').value.trim(),
+    milestones:document.getElementById('tk-milestones').value.trim(),
+    notebook:document.getElementById('tk-notebook').value.trim(),
+    notes:document.getElementById('tk-notes').value.trim(),
+  };
+  if(editingTankId){ const t=tanks.find(t=>t.id===editingTankId); if(t) Object.assign(t,data); }
+  else { tanks.unshift({id:Date.now(),...data,created:new Date().toISOString().split('T')[0]}); }
+  saveTanks(); closeModal('tank-modal'); renderTanks(); toast('Project saved ✓');
+  editingTankId=null;
+}
+
+function deleteTank(id){ if(confirm('Remove this project?')){ tanks=tanks.filter(t=>t.id!==id); saveTanks(); renderTanks(); } }
+
+
+// ═══════════════════════════════════════════
+// KANBAN DATA + LOGIC
+// ═══════════════════════════════════════════
+const KB_STAGES = [
+  {id:'inquiry',     label:'🔍 Inquiry',     color:'#7c3aed'},
+  {id:'viewing',     label:'📅 Viewing',     color:'#c9a84c'},
+  {id:'negotiation', label:'💬 Negotiation', color:'#2563eb'},
+  {id:'contract',    label:'📝 Contract',    color:'#d4634a'},
+  {id:'rental',      label:'🏡 Rental',      color:'#4caf50'},
+  {id:'maintenance', label:'🔧 Maintenance', color:'#a855f7'},
+  {id:'closed',      label:'✅ Closed',      color:'#64748b'},
+];
+
+// Auto-task templates per stage
+const KB_TASKS = {
+  viewing:     [{t:'Confirm appointment with owner',c:'Viewing',p:'high'},{t:'Prepare property info pack',c:'Viewing',p:'medium'},{t:'Send confirmation to client',c:'Viewing',p:'high'}],
+  negotiation: [{t:'Prepare price negotiation summary',c:'Follow-up',p:'medium'},{t:'Follow up with client on offer',c:'Follow-up',p:'high'}],
+  contract:    [{t:'Draft rental agreement',c:'Contract',p:'high'},{t:'Collect KYC documents',c:'Admin',p:'high'},{t:'Get contract signed',c:'Contract',p:'high'}],
+  rental:      [{t:'Collect first month rent + deposit',c:'Rental',p:'high'},{t:'Handover keys and walkthrough',c:'Rental',p:'medium'}],
+  maintenance: [{t:'Log maintenance issue',c:'Maintenance',p:'high'},{t:'Coordinate with vendor',c:'Maintenance',p:'medium'}],
+  closed:      [{t:'Archive deal documents',c:'Admin',p:'low'},{t:'Send thank you message',c:'Follow-up',p:'low'}],
+};
+
+let kdeals = JSON.parse(localStorage.getItem('samui_pm_kdeals') || 'null');
+if(!kdeals) {
+  kdeals = [
+    {id:9001,client:'Farid',property:'2 Bed / 1 Bath Villa',stage:'viewing',type:'Sale',platform:'Facebook',price:'฿2,400,000',contact:'Facebook',notes:'Viewing 2 Mar 10:00 AM',days:1,created:new Date().toISOString()},
+    {id:9002,client:'Sergei Volkov',property:'Sea View Villa, Lamai',stage:'inquiry',type:'Long-term',platform:'Telegram',price:'฿120,000/mo',contact:'Telegram',notes:'Wants sea view, pool, 3-bed',days:2,created:new Date().toISOString()},
+    {id:9003,client:'Emma Johansson',property:'Mae Nam Beach House',stage:'rental',type:'Long-term',platform:'Email',price:'฿45,000/mo',contact:'emma@email.com',notes:'6-month contract active',days:45,created:new Date().toISOString()},
+    {id:9004,client:'Anna Mueller',property:'Bophut Pool Villa',stage:'negotiation',type:'Sale',platform:'Line',price:'฿18,000,000',contact:'Line',notes:'2nd viewing done. In price discussion.',days:18,created:new Date().toISOString()},
+  ];
+  saveKDeals();
+}
+
+function saveKDeals(){ localStorage.setItem('samui_pm_kdeals', JSON.stringify(kdeals)); }
+
+let draggingId = null, editingKCardId = null;
+
+function renderKanban(){
+  const board = document.getElementById('kb-board');
+  if(!board) return;
+
+  // Summary stats
+  const active = kdeals.filter(d=>d.stage!=='closed').length;
+  document.getElementById('kb-total').textContent = kdeals.length;
+  document.getElementById('kb-active').textContent = active;
+  // Estimate total pipeline value
+  const vals = kdeals.filter(d=>d.stage!=='closed'&&d.price)
+    .map(d=>{ const m=d.price.replace(/[^0-9.]/g,''); return parseFloat(m)||0; });
+  const total = vals.reduce((s,v)=>s+v,0);
+  document.getElementById('kb-value').textContent = total>0 ? '฿'+total.toLocaleString('en',{maximumFractionDigits:0}) : '—';
+
+  board.innerHTML = KB_STAGES.map(stage=>{
+    const cards = kdeals.filter(d=>d.stage===stage.id);
+    return `<div class="kb-col" id="col-${stage.id}">
+      <div class="kb-col-header">
+        <div class="kb-col-dot" style="background:${stage.color};box-shadow:0 0 6px ${stage.color}55;"></div>
+        <div class="kb-col-title">${stage.label}</div>
+        <div class="kb-col-count">${cards.length}</div>
+      </div>
+      <div class="kb-col-body" id="colbody-${stage.id}"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="dropCard(event,'${stage.id}')">
+        ${cards.map(d=>renderKCard(d)).join('')}
+      </div>
+      <div class="kb-col-add">
+        <button class="kb-add-btn" onclick="openKCardModal(null,'${stage.id}')">＋ Add deal</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Re-attach drag events
+  document.querySelectorAll('.kb-card').forEach(card=>{
+    card.addEventListener('dragstart',e=>{
+      draggingId=parseInt(card.dataset.id);
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',e=>{
+      card.classList.remove('dragging');
+      document.querySelectorAll('.kb-col-body').forEach(c=>c.classList.remove('drag-over'));
+    });
+  });
+}
+
+function renderKCard(d){
+  const color = KB_STAGES.find(s=>s.id===d.stage)?.color||'#4a6b4a';
+  return `<div class="kb-card" data-id="${d.id}" draggable="true" style="border-left-color:${color};">
+    <div class="kc-client">${esc(d.client)}</div>
+    ${d.property?`<div class="kc-property">🏡 ${esc(d.property)}</div>`:''}
+    <div class="kc-meta">
+      ${d.price?`<span class="kc-badge kcb-price">${esc(d.price)}</span>`:''}
+      <span class="kc-badge kcb-type">${esc(d.type||'')}</span>
+      <span class="kc-badge kcb-plat">${esc(d.platform||'')}</span>
+    </div>
+    ${d.notes?`<div style="font-size:11px;color:var(--muted2);line-height:1.4;margin-bottom:3px;">${esc(d.notes).substring(0,55)}${d.notes.length>55?'…':''}</div>`:''}
+    <div class="kc-days">⏱ ${d.days||0} day${d.days!==1?'s':''} in stage</div>
+    <div class="kc-actions">
+      <div class="kca-btn" onclick="openKCardModal(${d.id})">✏️ Edit</div>
+      <div class="kca-btn" onclick="advanceCard(${d.id})">→ Next</div>
+      <div class="kca-btn del" onclick="deleteKCard(${d.id})">✕</div>
+    </div>
+  </div>`;
+}
+
+function dropCard(e, newStage){
+  e.preventDefault();
+  document.getElementById('colbody-'+newStage).classList.remove('drag-over');
+  if(!draggingId) return;
+  const deal = kdeals.find(d=>d.id===draggingId);
+  if(!deal) return;
+  const oldStage = deal.stage;
+  if(oldStage===newStage) return;
+  deal.stage = newStage;
+  deal.days = 0;
+  deal.stageChanged = new Date().toISOString();
+  saveKDeals();
+  // Auto-generate tasks
+  const tasks = KB_TASKS[newStage];
+  if(tasks) generateKanbanTasks(deal, tasks);
+  renderKanban();
+  toast(`${deal.client} moved to ${KB_STAGES.find(s=>s.id===newStage)?.label} ${tasks?'· '+tasks.length+' tasks created':''}`);
+  draggingId=null;
+}
+
+function advanceCard(id){
+  const deal=kdeals.find(d=>d.id===id); if(!deal) return;
+  const idx=KB_STAGES.findIndex(s=>s.id===deal.stage);
+  if(idx<KB_STAGES.length-1){
+    const newStage=KB_STAGES[idx+1].id;
+    deal.stage=newStage; deal.days=0;
+    const tasks=KB_TASKS[newStage];
+    if(tasks) generateKanbanTasks(deal,tasks);
+    saveKDeals(); renderKanban();
+    toast(`${deal.client} → ${KB_STAGES[idx+1].label}`);
+  }
+}
+
+function generateKanbanTasks(deal, taskDefs){
+  const existing = JSON.parse(localStorage.getItem('samui_pm_v2')||'[]');
+  const platMap = {Facebook:'other',Telegram:'telegram',Line:'line',WhatsApp:'other',Email:'email',Call:'call'};
+  const newTasks = taskDefs.map(t=>({
+    id:Date.now()+Math.random(),
+    title: t.t + (deal.client?' — '+deal.client:''),
+    client: deal.client||'',
+    property: deal.property||'',
+    prio: t.p, cat: t.c,
+    platform: platMap[deal.platform]||'other',
+    due:'', notes:'Auto-generated from Kanban pipeline',
+    done:false, created:new Date().toISOString()
+  }));
+  localStorage.setItem('samui_pm_v2', JSON.stringify([...newTasks,...existing]));
+}
+
+function openKCardModal(id, defaultStage){
+  editingKCardId=id||null;
+  document.getElementById('kcard-modal-title').textContent = id?'Edit Deal':'Add Deal';
+  const d = id ? kdeals.find(d=>d.id===id) : null;
+  document.getElementById('kc-client').value   = d?.client||'';
+  document.getElementById('kc-property').value = d?.property||'';
+  document.getElementById('kc-stage').value    = d?.stage || defaultStage||'inquiry';
+  document.getElementById('kc-type').value     = d?.type||'Long-term';
+  document.getElementById('kc-platform').value = d?.platform||'Telegram';
+  document.getElementById('kc-price').value    = d?.price||'';
+  document.getElementById('kc-contact').value  = d?.contact||'';
+  document.getElementById('kc-notes').value    = d?.notes||'';
+  openModal('kcard-modal');
+}
+
+function saveKCard(){
+  const client = document.getElementById('kc-client').value.trim();
+  if(!client) return;
+  const data = {
+    client, property:document.getElementById('kc-property').value.trim(),
+    stage:document.getElementById('kc-stage').value,
+    type:document.getElementById('kc-type').value,
+    platform:document.getElementById('kc-platform').value,
+    price:document.getElementById('kc-price').value.trim(),
+    contact:document.getElementById('kc-contact').value.trim(),
+    notes:document.getElementById('kc-notes').value.trim(),
+  };
+  if(editingKCardId){
+    const d=kdeals.find(d=>d.id===editingKCardId); if(d) Object.assign(d,data);
+  } else {
+    kdeals.unshift({id:Date.now(),...data,days:0,created:new Date().toISOString()});
+  }
+  saveKDeals(); closeModal('kcard-modal'); renderKanban(); toast('Deal saved ✓');
+  editingKCardId=null;
+}
+
+function deleteKCard(id){
+  if(!confirm('Remove this deal?'))return;
+  kdeals=kdeals.filter(d=>d.id!==id); saveKDeals(); renderKanban();
+}
+
+
+</script>
+
+<!-- ── TANK PROJECT MODAL ── -->
+<div class="modal-ov" id="tank-modal">
+  <div class="modal-box" style="max-width:580px;">
+    <h3 id="tank-modal-title">Add Tank Project</h3>
+    <div class="m2col">
+      <div class="mrow"><label>Project Name *</label><input type="text" id="tk-name" placeholder="e.g. Empty Space" /></div>
+      <div class="mrow"><label>Status</label>
+        <select id="tk-status">
+          <option value="concept">💡 Concept</option>
+          <option value="planning">📋 Planning</option>
+          <option value="active">🚀 Active</option>
+          <option value="hold">⏸ On Hold</option>
+          <option value="done">✅ Done</option>
+        </select>
+      </div>
+    </div>
+    <div class="m2col">
+      <div class="mrow"><label>Category</label><input type="text" id="tk-cat" placeholder="e.g. Wellness, Property, Creative" /></div>
+      <div class="mrow"><label>Target Revenue</label><input type="text" id="tk-revenue" placeholder="e.g. ฿300,000/mo" /></div>
+    </div>
+    <div class="mrow"><label>Location / Venue</label><input type="text" id="tk-location" placeholder="e.g. Koh Samui" /></div>
+    <div class="mrow"><label>Vision / Description</label><textarea id="tk-vision" placeholder="What is this project about?" style="min-height:70px;resize:vertical;"></textarea></div>
+    <div class="mrow"><label>Key Milestones (Year 1 / Year 2 / Year 3)</label><textarea id="tk-milestones" placeholder="Year 1: Build Community & Brand&#10;Year 2: Premium Workshop & Collaboration&#10;Year 3: Pop-up Rituals & Resort Expansion" style="min-height:70px;resize:vertical;"></textarea></div>
+    <div class="mrow"><label>NotebookLM Link</label><input type="text" id="tk-notebook" placeholder="https://notebooklm.google.com/notebook/..." /></div>
+    <div class="mrow"><label>Notes</label><textarea id="tk-notes" placeholder="Partners, ideas, references..." style="min-height:50px;resize:vertical;"></textarea></di
