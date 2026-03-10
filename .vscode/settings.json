@@ -1,6 +1,0 @@
-{
-    "github-actions.workflows.pinned.workflows": [
-        "dynamic/copilot-swe-agent/copilot"
-    ],
-    "github.copilot.chat.codeGeneration.useInstructionFiles": true
-}
