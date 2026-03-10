@@ -5,7 +5,7 @@
 // ============================================================
 
 // ─── CONFIG (set these in Cloudflare Worker Environment Variables) ───────────
-// TELEGRAM_BOT_TOKEN  = ***REMOVED***
+// TELEGRAM_BOT_TOKEN  = 8591137497:AAEuuz0iA6WMKyRwYwZiFn3J94Taipefkm0
 // CLAUDE_API_KEY      = bvJF5iFm0gImZ5cE6Kzqr92VlILWSZmKtaNcNgyf
 // WEBHOOK_SECRET      = chowto2026secret
 // ────────────────────────────────────────────────────────────────────────────
