@@ -509,13 +509,10 @@ Include "transaction" ONLY if the user mentions a new deal, client, or property 
       content:m.role==='assistant'?(m.parsed?.message||m.content||''):m.content
     }));
 
-    // TODO: proxy this request through a Cloudflare Worker that injects x-api-key and
-    // anthropic-version headers server-side; do not call the Anthropic API directly from
-    // client-side JS as it would require embedding an API key in the browser.
     const res = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-5-20251101',max_tokens:1000,system:systemPrompt,messages:apiMsgs})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:systemPrompt,messages:apiMsgs})
     });
     const data = await res.json();
     const raw = data?.content?.[0]?.text||'{"message":"Sorry, I could not process that."}';
