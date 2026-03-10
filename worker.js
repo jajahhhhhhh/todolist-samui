@@ -1,298 +1,346 @@
-/**
- * CHOWTO Property Management — Telegram Bot
- * Cloudflare Worker (JavaScript)
- * 
- * Environment Variables Required:
- *   BOT_TOKEN       — Telegram Bot token from @BotFather
- *   CLAUDE_API_KEY  — Anthropic API key
- *   WEBHOOK_SECRET  — Random secret string for webhook verification (optional but recommended)
- */
+// ============================================================
+// CHOWTO Telegram Bot — Cloudflare Worker
+// Real-time message capture → Task list
+// Deploy at: Cloudflare Dashboard → Workers → New Worker
+// ============================================================
 
-// ─── System Prompt ────────────────────────────────────────────────────────────
+// ─── CONFIG (set these in Cloudflare Worker Environment Variables) ───────────
+// TELEGRAM_BOT_TOKEN  = 8591137497:AAEuuz0iA6WMKyRwYwZiFn3J94Taipefkm0
+// CLAUDE_API_KEY      = bvJF5iFm0gImZ5cE6Kzqr92VlILWSZmKtaNcNgyf
+// WEBHOOK_SECRET      = chowto2026secret
+// ────────────────────────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are the CHOWTO Property Management assistant for Koh Samui, Thailand.
-You help J manage rental properties, clients, and deals through Telegram.
+// In-memory task store (persists during worker lifetime)
+// For production: replace with Cloudflare KV or D1
+let TASKS = [];
+let TASK_ID = 1;
 
-Your capabilities:
-- Log client inquiries and requirements (villas, condos, budgets, dates)
-- Track property availability (Chaweng Noi mountain view house, Thaledi 3-storey commercial building)
-- Manage deal pipeline: New Lead → Viewing → Negotiation → Closed
-- Draft messages in English, Thai 🇹🇭, and Russian 🇷🇺
-- Summarize daily tasks and priorities
-- Format responses with clear structure using emojis
-
-Client channels:
-- Telegram: Russian & European clients
-- Line: Thai clients  
-- Facebook Messenger: International expats
-
-Always respond concisely and professionally. When asked to draft messages, provide them in the requested language(s).
-When logging a new lead or property requirement, confirm the details back in a structured format.
-
-Current properties managed:
-1. Chaweng Noi — Mountain View House (residential)
-2. Thaledi — 3-Storey Commercial Building
-
-Respond in the same language the user writes in (English/Thai/Russian). Default to English.`;
-
-// ─── Claude API ───────────────────────────────────────────────────────────────
-
-async function askClaude(userMessage, history = [], apiKey) {
-  const messages = [
-    ...history,
-    { role: "user", content: userMessage }
-  ];
-
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01"
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages
-    })
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Claude API error: ${response.status} — ${err}`);
-  }
-
-  const data = await response.json();
-  return data.content[0].text;
-}
-
-// ─── Telegram API Helpers ─────────────────────────────────────────────────────
-
-async function sendMessage(chatId, text, botToken, options = {}) {
-  const payload = {
-    chat_id: chatId,
-    text,
-    parse_mode: "Markdown",
-    ...options
-  };
-
-  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-}
-
-async function sendTyping(chatId, botToken) {
-  await fetch(`https://api.telegram.org/bot${botToken}/sendChatAction`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, action: "typing" })
-  });
-}
-
-// ─── Conversation History (in-memory per worker instance) ────────────────────
-// For persistent history, replace with KV store (see KV section below)
-
-const conversationHistory = new Map();
-
-function getHistory(chatId) {
-  return conversationHistory.get(chatId) || [];
-}
-
-function appendHistory(chatId, role, content) {
-  const history = getHistory(chatId);
-  history.push({ role, content });
-  // Keep last 20 messages to stay within context limits
-  if (history.length > 20) history.splice(0, history.length - 20);
-  conversationHistory.set(chatId, history);
-}
-
-// ─── Command Handlers ─────────────────────────────────────────────────────────
-
-async function handleStart(chatId, botToken) {
-  const welcome = `🏝️ *CHOWTO Property Management Bot*
-
-สวัสดี! Привет! Hello!
-
-I'm your AI assistant for managing properties on *Koh Samui*.
-
-*Quick commands:*
-/start — Show this menu
-/newlead — Log a new client inquiry
-/properties — View current property inventory
-/tasks — Today's priority tasks
-/draft — Draft a client message
-/clear — Clear conversation history
-
-Or just *type freely* — I understand English, Thai, and Russian! 🌏`;
-
-  await sendMessage(chatId, welcome, botToken);
-}
-
-async function handleProperties(chatId, botToken) {
-  const inventory = `🏠 *Current Property Inventory*
-
-1️⃣ *Chaweng Noi — Mountain View House*
-   📍 Chaweng Noi, Koh Samui
-   🏡 Type: Residential Villa
-   🌄 Feature: Mountain view
-   📋 Status: Available for inquiry
-
-2️⃣ *Thaledi — Commercial Building*
-   📍 Thaledi, Koh Samui
-   🏢 Type: 3-Storey Commercial
-   📋 Status: Available for inquiry
-
-_Type /newlead to log a client requirement_`;
-
-  await sendMessage(chatId, inventory, botToken);
-}
-
-async function handleClear(chatId, botToken) {
-  conversationHistory.delete(chatId);
-  await sendMessage(chatId, "✅ Conversation history cleared.", botToken);
-}
-
-// ─── Main Message Handler ─────────────────────────────────────────────────────
-
-async function handleMessage(message, env) {
-  const chatId = message.chat.id;
-  const text = message.text || "";
-  const botToken = env.BOT_TOKEN;
-
-  // Commands
-  if (text === "/start") return handleStart(chatId, botToken);
-  if (text === "/properties") return handleProperties(chatId, botToken);
-  if (text === "/clear") return handleClear(chatId, botToken);
-
-  // Show typing indicator
-  await sendTyping(chatId, botToken);
-
-  // For /newlead, /tasks, /draft — pass to Claude with context
-  let userMessage = text;
-  if (text === "/newlead") userMessage = "Help me log a new client lead. Ask me for their name, contact, property type, budget, and preferred dates.";
-  if (text === "/tasks") userMessage = "List my top 5 property management priorities for today based on our recent conversation.";
-  if (text === "/draft") userMessage = "Help me draft a professional message to a client. Ask me for the language (English/Thai/Russian), recipient, and what to communicate.";
-
-  try {
-    // Get conversation history
-    const history = getHistory(chatId);
-
-    // Get Claude response
-    const reply = await askClaude(userMessage, history, env.CLAUDE_API_KEY);
-
-    // Save to history
-    appendHistory(chatId, "user", userMessage);
-    appendHistory(chatId, "assistant", reply);
-
-    // Send reply
-    await sendMessage(chatId, reply, botToken);
-  } catch (err) {
-    console.error("Error:", err);
-    await sendMessage(
-      chatId,
-      "⚠️ Something went wrong. Please try again in a moment.",
-      botToken
-    );
-  }
-}
-
-// ─── Webhook Setup Helper ─────────────────────────────────────────────────────
-// Visit: https://your-worker.workers.dev/setup to register the webhook
-
-async function setupWebhook(request, env) {
-  const workerUrl = new URL(request.url).origin;
-  const webhookUrl = `${workerUrl}/webhook`;
-
-  const res = await fetch(
-    `https://api.telegram.org/bot${env.BOT_TOKEN}/setWebhook`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: webhookUrl,
-        secret_token: env.WEBHOOK_SECRET || undefined,
-        allowed_updates: ["message"]
-      })
-    }
-  );
-
-  const data = await res.json();
-  return new Response(JSON.stringify(data, null, 2), {
-    headers: { "Content-Type": "application/json" }
-  });
-}
-
-// ─── Cloudflare Worker Entry Point ────────────────────────────────────────────
-
+// ─── MAIN HANDLER ────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Webhook setup endpoint
-    if (url.pathname === "/setup" && request.method === "GET") {
-      return setupWebhook(request, env);
+    // Webhook from Telegram
+    if (request.method === "POST" && url.pathname === "/webhook") {
+      return handleWebhook(request, env);
     }
 
-    // Telegram webhook endpoint
-    if (url.pathname === "/webhook" && request.method === "POST") {
-      // Verify webhook secret if set
-      if (env.WEBHOOK_SECRET) {
-        const secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token");
-        if (secret !== env.WEBHOOK_SECRET) {
-          return new Response("Unauthorized", { status: 401 });
-        }
-      }
-
-      try {
-        const update = await request.json();
-
-        if (update.message) {
-          await handleMessage(update.message, env);
-        }
-
-        return new Response("OK", { status: 200 });
-      } catch (err) {
-        console.error("Webhook error:", err);
-        return new Response("Error", { status: 500 });
-      }
+    // View tasks as JSON (for dashboard integration)
+    if (url.pathname === "/tasks") {
+      return new Response(JSON.stringify(TASKS, null, 2), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      });
     }
 
     // Health check
-    if (url.pathname === "/") {
-      return new Response("🏝️ CHOWTO Bot is running!", { status: 200 });
-    }
-
-    return new Response("Not Found", { status: 404 });
+    return new Response("🤖 CHOWTO Bot is running!", { status: 200 });
   }
 };
 
-/**
- * ─── OPTIONAL: Persistent History with Cloudflare KV ──────────────────────────
- * 
- * To persist conversations across worker restarts:
- * 
- * 1. Create a KV namespace in Cloudflare dashboard: "CHOWTO_SESSIONS"
- * 2. Bind it in wrangler.toml:
- *    [[kv_namespaces]]
- *    binding = "SESSIONS"
- *    id = "your-kv-namespace-id"
- * 
- * 3. Replace getHistory / appendHistory with:
- * 
- *    async function getHistory(chatId, env) {
- *      const data = await env.SESSIONS.get(`chat:${chatId}`, "json");
- *      return data || [];
- *    }
- * 
- *    async function appendHistory(chatId, role, content, env) {
- *      const history = await getHistory(chatId, env);
- *      history.push({ role, content });
- *      if (history.length > 20) history.splice(0, history.length - 20);
- *      await env.SESSIONS.put(`chat:${chatId}`, JSON.stringify(history), {
- *        expirationTtl: 86400  // 24 hours
- *      });
- *    }
- */
+// ─── WEBHOOK HANDLER ─────────────────────────────────────────────────────────
+async function handleWebhook(request, env) {
+  try {
+    // Verify secret
+    const secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token");
+    if (secret !== env.WEBHOOK_SECRET) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    const body = await request.json();
+    const msg = body.message || body.edited_message;
+    if (!msg) return new Response("OK");
+
+    const chatId = msg.chat.id;
+    const text = msg.text || "";
+    const from = msg.from?.first_name || "Unknown";
+    const chatTitle = msg.chat.title || msg.chat.first_name || "Private";
+
+    // Handle commands
+    if (text.startsWith("/")) {
+      return handleCommand(text, chatId, chatTitle, from, env);
+    }
+
+    // Auto-detect if message looks like a task/work item
+    const isWorkRelated = await detectWorkMessage(text, env);
+
+    if (isWorkRelated) {
+      // Extract task using Claude AI
+      const task = await extractTask(text, chatTitle, from, env);
+      if (task) {
+        TASKS.unshift(task);
+        await sendMessage(chatId, formatTaskAdded(task), env);
+      }
+    }
+
+    return new Response("OK");
+  } catch (err) {
+    console.error("Webhook error:", err);
+    return new Response("Error", { status: 500 });
+  }
+}
+
+// ─── COMMAND HANDLER ─────────────────────────────────────────────────────────
+async function handleCommand(text, chatId, chatTitle, from, env) {
+  const cmd = text.split(" ")[0].toLowerCase();
+  const args = text.slice(cmd.length).trim();
+
+  switch (cmd) {
+    case "/tasks":
+    case "/งาน":
+      return sendAndReturn(chatId, formatTaskList(), env);
+
+    case "/add":
+    case "/เพิ่ม":
+      if (!args) return sendAndReturn(chatId, "❌ กรุณาระบุงาน\nตัวอย่าง: /add ส่งเอกสารให้ Joy", env);
+      const newTask = createTask(args, chatTitle, from, "medium");
+      TASKS.unshift(newTask);
+      return sendAndReturn(chatId, formatTaskAdded(newTask), env);
+
+    case "/done":
+    case "/เสร็จ":
+      const doneId = parseInt(args);
+      const doneTask = TASKS.find(t => t.id === doneId);
+      if (doneTask) {
+        doneTask.done = true;
+        doneTask.doneAt = new Date().toISOString();
+        return sendAndReturn(chatId, `✅ เสร็จแล้ว: *${doneTask.title}*`, env);
+      }
+      return sendAndReturn(chatId, "❌ ไม่พบงานหมายเลขนี้", env);
+
+    case "/delete":
+    case "/ลบ":
+      const delId = parseInt(args);
+      const before = TASKS.length;
+      TASKS = TASKS.filter(t => t.id !== delId);
+      return sendAndReturn(chatId,
+        TASKS.length < before ? `🗑 ลบงาน #${delId} แล้ว` : "❌ ไม่พบงานหมายเลขนี้",
+        env
+      );
+
+    case "/urgent":
+    case "/ด่วน":
+      const urgId = parseInt(args);
+      const urgTask = TASKS.find(t => t.id === urgId);
+      if (urgTask) {
+        urgTask.urgent = !urgTask.urgent;
+        return sendAndReturn(chatId, `⚡ งาน #${urgId} ${urgTask.urgent ? "ตั้งเป็นด่วน" : "ยกเลิกด่วน"}แล้ว`, env);
+      }
+      return sendAndReturn(chatId, "❌ ไม่พบงาน", env);
+
+    case "/clear":
+      const count = TASKS.filter(t => t.done).length;
+      TASKS = TASKS.filter(t => !t.done);
+      return sendAndReturn(chatId, `🧹 ลบงานที่เสร็จแล้ว ${count} รายการ`, env);
+
+    case "/help":
+    case "/ช่วย":
+      return sendAndReturn(chatId, HELP_TEXT, env);
+
+    case "/newlead":
+      if (!args) return sendAndReturn(chatId, "❌ กรุณาระบุรายละเอียด\nตัวอย่าง: /newlead Anna 3 bed villa Lamai 110k/mo", env);
+      const lead = await extractPropertyLead(args, env);
+      TASKS.unshift(lead);
+      return sendAndReturn(chatId, formatLeadAdded(lead), env);
+
+    default:
+      return sendAndReturn(chatId, "❓ คำสั่งไม่ถูกต้อง พิมพ์ /help เพื่อดูคำสั่งทั้งหมด", env);
+  }
+}
+
+// ─── AI FUNCTIONS ─────────────────────────────────────────────────────────────
+async function detectWorkMessage(text, env) {
+  // Quick keyword check first (faster + cheaper)
+  const workKeywords = [
+    "ดู", "นัด", "จ่าย", "โอน", "ส่ง", "ติดต่อ", "ติดตาม", "ฝาก", "รับ",
+    "viewing", "payment", "transfer", "send", "client", "rent", "lease",
+    "property", "villa", "house", "ค่าเช่า", "โฉนด", "สัญญา", "เอกสาร",
+    "meeting", "นัดหมาย", "พบ", "ประชุม", "ตรวจ", "ซ่อม"
+  ];
+  const lower = text.toLowerCase();
+  return workKeywords.some(k => lower.includes(k));
+}
+
+async function extractTask(text, source, from, env) {
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": env.CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        system: `You are a task extractor for a property management business in Koh Samui, Thailand.
+Extract a task from the message. Return ONLY valid JSON, no other text:
+{
+  "title": "short task title in Thai or English",
+  "detail": "brief detail",
+  "due": "due date if mentioned, else empty string",
+  "priority": "high|medium|low",
+  "tag": "ลูกค้า|การเงิน|พร็อพเพอร์ตี้|แอดมิน|ดูพร็อพเพอร์ตี้|อื่นๆ"
+}
+If this is NOT a task, return: {"skip": true}`,
+        messages: [{ role: "user", content: `Source: ${source}\nFrom: ${from}\nMessage: ${text}` }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || "{}";
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+
+    if (parsed.skip) return null;
+
+    return {
+      id: TASK_ID++,
+      title: parsed.title || text.slice(0, 60),
+      detail: parsed.detail || "",
+      due: parsed.due || "",
+      priority: parsed.priority || "medium",
+      tag: parsed.tag || "อื่นๆ",
+      source: "Telegram",
+      chatName: source,
+      from,
+      done: false,
+      urgent: parsed.priority === "high",
+      createdAt: new Date().toISOString(),
+      rawMessage: text
+    };
+  } catch (err) {
+    // Fallback: create basic task without AI
+    return createTask(text, source, from, "medium");
+  }
+}
+
+async function extractPropertyLead(text, env) {
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": env.CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        system: `Extract property lead info. Return ONLY JSON:
+{"client":"name","beds":"3-4","budget":110000,"area":"Lamai","moveIn":"April","contract":"2 years","notes":"any other info"}`,
+        messages: [{ role: "user", content: text }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || "{}";
+    const lead = JSON.parse(raw.replace(/```json|```/g, "").trim());
+
+    return {
+      id: TASK_ID++,
+      title: `🏠 Lead: ${lead.client || "New Client"} — ${lead.beds || "?"} bed ฿${(lead.budget || 0).toLocaleString()}/mo`,
+      detail: `ย่าน: ${lead.area || "-"} · เข้า: ${lead.moveIn || "-"} · สัญญา: ${lead.contract || "-"} · ${lead.notes || ""}`,
+      due: "ASAP",
+      priority: "high",
+      tag: "ลูกค้า",
+      source: "Telegram",
+      done: false,
+      urgent: true,
+      createdAt: new Date().toISOString(),
+      leadData: lead
+    };
+  } catch {
+    return createTask(text, "Telegram", "Manual", "high");
+  }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function createTask(title, source, from, priority) {
+  return {
+    id: TASK_ID++,
+    title: title.slice(0, 100),
+    detail: "",
+    due: "",
+    priority,
+    tag: "อื่นๆ",
+    source: "Telegram",
+    chatName: source,
+    from,
+    done: false,
+    urgent: priority === "high",
+    createdAt: new Date().toISOString()
+  };
+}
+
+function formatTaskAdded(task) {
+  const p = task.priority === "high" ? "🔴" : task.priority === "medium" ? "🟡" : "🟢";
+  return `✅ *บันทึกงานแล้ว #${task.id}*\n\n${p} ${task.title}\n${task.detail ? `📝 ${task.detail}\n` : ""}${task.due ? `🗓 ${task.due}\n` : ""}🏷 ${task.tag}\n\nพิมพ์ /tasks เพื่อดูทั้งหมด`;
+}
+
+function formatLeadAdded(task) {
+  return `🏠 *บันทึก Lead แล้ว #${task.id}*\n\n${task.title}\n${task.detail}\n\n⚡ ตั้งเป็นงานด่วน\nพิมพ์ /tasks เพื่อดูทั้งหมด`;
+}
+
+function formatTaskList() {
+  const pending = TASKS.filter(t => !t.done);
+  const done = TASKS.filter(t => t.done);
+
+  if (TASKS.length === 0) return "📭 ยังไม่มีงาน\nพิมพ์ /add [ชื่องาน] เพื่อเพิ่ม";
+
+  let msg = `📋 *รายการงาน* (${pending.length} ค้างอยู่)\n\n`;
+
+  // Urgent first
+  const urgent = pending.filter(t => t.urgent);
+  const normal = pending.filter(t => !t.urgent);
+
+  if (urgent.length) {
+    msg += "⚡ *ด่วน*\n";
+    urgent.forEach(t => {
+      msg += `• #${t.id} ${t.title}${t.due ? ` · ${t.due}` : ""}\n`;
+    });
+    msg += "\n";
+  }
+
+  if (normal.length) {
+    msg += "📌 *ปกติ*\n";
+    normal.slice(0, 10).forEach(t => {
+      const p = t.priority === "high" ? "🔴" : t.priority === "medium" ? "🟡" : "🟢";
+      msg += `${p} #${t.id} ${t.title}\n`;
+    });
+  }
+
+  if (done.length) msg += `\n✅ เสร็จแล้ว ${done.length} รายการ`;
+
+  msg += "\n\n_/done [#] · /urgent [#] · /add [งาน]_";
+  return msg;
+}
+
+const HELP_TEXT = `🤖 *CHOWTO Bot Commands*
+
+*งาน*
+/tasks หรือ /งาน — ดูรายการงานทั้งหมด
+/add [ชื่องาน] — เพิ่มงานใหม่
+/done [#] — ทำเครื่องหมายเสร็จ
+/urgent [#] — ตั้ง/ยกเลิกด่วน
+/delete [#] — ลบงาน
+/clear — ลบงานที่เสร็จแล้ว
+
+*Property*
+/newlead [รายละเอียด] — เพิ่ม lead ลูกค้าใหม่
+
+*อื่นๆ*
+/help — ดูคำสั่งทั้งหมด
+
+🔄 *Auto-capture*: บอทจะดักจับข้อความที่เกี่ยวกับงานโดยอัตโนมัติ!`;
+
+async function sendMessage(chatId, text, env) {
+  return fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" })
+  });
+}
+
+async function sendAndReturn(chatId, text, env) {
+  await sendMessage(chatId, text, env);
+  return new Response("OK");
+}
