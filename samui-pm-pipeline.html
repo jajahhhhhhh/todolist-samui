@@ -357,7 +357,6 @@ function openNewCard(){
   document.getElementById('f-stage').value='inquiry';
   updateTasksPreview('inquiry');
   document.getElementById('modal').classList.add('open');
-  document.getElementById('f-stage').addEventListener('change', e => updateTasksPreview(e.target.value));
   setTimeout(()=>document.getElementById('f-client').focus(), 100);
 }
 
@@ -388,6 +387,7 @@ function updateTasksPreview(stage){
 
 function closeModal(){ document.getElementById('modal').classList.remove('open'); editingId=null; }
 document.getElementById('modal').addEventListener('click', e=>{ if(e.target===document.getElementById('modal')) closeModal(); });
+document.getElementById('f-stage').addEventListener('change', e => updateTasksPreview(e.target.value));
 
 function saveCard(){
   const client = document.getElementById('f-client').value.trim();
