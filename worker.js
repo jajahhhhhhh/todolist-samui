@@ -5,9 +5,9 @@
 // ============================================================
 
 // ─── CONFIG (set these in Cloudflare Worker Environment Variables) ───────────
-// TELEGRAM_BOT_TOKEN  = 8591137497:AAEuuz0iA6WMKyRwYwZiFn3J94Taipefkm0
+// TELEGRAM_BOT_TOKEN  = 8591137497:AAGE7LoBas7eHHorCKlJ-TikYzKlZhMUoGM
 // CLAUDE_API_KEY      = bvJF5iFm0gImZ5cE6Kzqr92VlILWSZmKtaNcNgyf
-// WEBHOOK_SECRET      = chowto2026secret
+// WEBHOOK_SECRET      = any random string e.g. "chowto2026secure"
 // ────────────────────────────────────────────────────────────────────────────
 
 // In-memory task store (persists during worker lifetime)
@@ -150,14 +150,40 @@ async function handleCommand(text, chatId, chatTitle, from, env) {
 // ─── AI FUNCTIONS ─────────────────────────────────────────────────────────────
 async function detectWorkMessage(text, env) {
   // Quick keyword check first (faster + cheaper)
-  const workKeywords = [
+  // 🇹🇭 Thai keywords
+  const thaiKeywords = [
     "ดู", "นัด", "จ่าย", "โอน", "ส่ง", "ติดต่อ", "ติดตาม", "ฝาก", "รับ",
-    "viewing", "payment", "transfer", "send", "client", "rent", "lease",
-    "property", "villa", "house", "ค่าเช่า", "โฉนด", "สัญญา", "เอกสาร",
-    "meeting", "นัดหมาย", "พบ", "ประชุม", "ตรวจ", "ซ่อม"
+    "ค่าเช่า", "โฉนด", "สัญญา", "เอกสาร", "นัดหมาย", "พบ", "ประชุม",
+    "ตรวจ", "ซ่อม", "ลูกค้า", "บ้าน", "คอนโด", "ที่ดิน", "วิลล่า",
+    "จอง", "ชำระ", "ค้าง", "หนี้", "ติดตาม", "รายงาน", "ประสาน"
   ];
+
+  // 🇬🇧 English keywords
+  const engKeywords = [
+    "viewing", "payment", "transfer", "send", "client", "rent", "lease",
+    "property", "villa", "house", "meeting", "contract", "document",
+    "follow up", "followup", "deposit", "urgent", "asap", "deadline",
+    "invoice", "receipt", "confirm", "appointment", "schedule", "book",
+    "tenant", "landlord", "agent", "commission", "sign", "inspect"
+  ];
+
+  // 🇷🇺 Russian keywords
+  const ruKeywords = [
+    // Property & meetings
+    "встреча", "показ", "осмотр", "аренда", "квартира", "дом", "вилла",
+    "договор", "контракт", "документ", "оплата", "перевод", "задаток",
+    // Communication & tasks
+    "отправить", "позвонить", "написать", "связаться", "напомнить",
+    "срочно", "важно", "клиент", "покупатель", "арендатор", "владелец",
+    // Status words
+    "подтвердить", "согласовать", "проверить", "оформить", "подписать",
+    "ждет", "ожидает", "готов", "сделка", "задолженность", "долг",
+    // Common short forms
+    "звони", "пиши", "надо", "нужно", "должен", "должна"
+  ];
+
   const lower = text.toLowerCase();
-  return workKeywords.some(k => lower.includes(k));
+  return [...thaiKeywords, ...engKeywords, ...ruKeywords].some(k => lower.includes(k));
 }
 
 async function extractTask(text, source, from, env) {
@@ -173,14 +199,19 @@ async function extractTask(text, source, from, env) {
         model: "claude-sonnet-4-20250514",
         max_tokens: 300,
         system: `You are a task extractor for a property management business in Koh Samui, Thailand.
+The business communicates in Thai, English, and Russian.
 Extract a task from the message. Return ONLY valid JSON, no other text:
 {
-  "title": "short task title in Thai or English",
+  "title": "short task title — keep in original language or English",
   "detail": "brief detail",
   "due": "due date if mentioned, else empty string",
   "priority": "high|medium|low",
   "tag": "ลูกค้า|การเงิน|พร็อพเพอร์ตี้|แอดมิน|ดูพร็อพเพอร์ตี้|อื่นๆ"
 }
+Language rules:
+- Thai message → respond in Thai
+- Russian message → respond in Russian  
+- English message → respond in English
 If this is NOT a task, return: {"skip": true}`,
         messages: [{ role: "user", content: `Source: ${source}\nFrom: ${from}\nMessage: ${text}` }]
       })
@@ -314,23 +345,26 @@ function formatTaskList() {
   return msg;
 }
 
-const HELP_TEXT = `🤖 *CHOWTO Bot Commands*
+const HELP_TEXT = `🤖 *CHOWTO Bot — @allchathelpbot*
+_Supports 🇹🇭 Thai · 🇬🇧 English · 🇷🇺 Russian_
 
-*งาน*
-/tasks หรือ /งาน — ดูรายการงานทั้งหมด
-/add [ชื่องาน] — เพิ่มงานใหม่
-/done [#] — ทำเครื่องหมายเสร็จ
-/urgent [#] — ตั้ง/ยกเลิกด่วน
-/delete [#] — ลบงาน
-/clear — ลบงานที่เสร็จแล้ว
+*งาน / Tasks / Задачи*
+/tasks — ดูรายการงาน · View tasks · Список задач
+/add [text] — เพิ่มงาน · Add task · Добавить задачу
+/done [#] — ทำเครื่องหมายเสร็จ · Mark done
+/urgent [#] — ตั้งด่วน · Set urgent · Срочно
+/delete [#] — ลบงาน · Delete task
+/clear — ลบงานที่เสร็จ · Clear done tasks
 
-*Property*
-/newlead [รายละเอียด] — เพิ่ม lead ลูกค้าใหม่
+*Property / Недвижимость*
+/newlead [details] — เพิ่ม lead ลูกค้า
+_Example: /newlead Anna villa 3 bed Lamai 110k_
 
-*อื่นๆ*
-/help — ดูคำสั่งทั้งหมด
+*อื่นๆ / Other*
+/help — แสดงคำสั่ง · Show commands
 
-🔄 *Auto-capture*: บอทจะดักจับข้อความที่เกี่ยวกับงานโดยอัตโนมัติ!`;
+🔄 *Auto-capture* — บอทจับข้อความงานอัตโนมัติ 3 ภาษา!
+_Автоматически распознаёт рабочие сообщения_`;
 
 async function sendMessage(chatId, text, env) {
   return fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
