@@ -637,8 +637,6 @@ header{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);d
     </div>
   </div>
 </div>
-
-
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── DATA ──────────────────────────────────────────────────────────────────
 let clients  = JSON.parse(localStorage.getItem('samui_crm') || 'null');
@@ -662,6 +660,22 @@ if(!props) {
     {id:2003,name:'Chaweng Hilltop Villa',location:'Chaweng',beds:4,baths:3,pool:'yes',rate:'฿180,000/mo',status:'available',owner:'คุณประเสริฐ',ownerContact:'086-xxx-xxxx',tenant:'',notes:'360° sea view, infinity pool, premium finish.',emoji:'⛰️'},
     {id:2004,name:'Bophut Pool Villa',location:'Bophut',beds:3,baths:2,pool:'yes',rate:'฿85,000/mo',status:'rented',owner:'คุณนิดา',ownerContact:'085-xxx-xxxx',tenant:'Ongoing listing',notes:'Traditional Thai style, private pool, near Fisherman\'s Village.',emoji:'🏡'},
     {id:2005,name:'Lamai Garden House',location:'Lamai',beds:2,baths:1,pool:'no',rate:'฿25,000/mo',status:'maintenance',owner:'คุณอนุชา',ownerContact:'087-xxx-xxxx',tenant:'',notes:'AC servicing and repainting in progress.',emoji:'🔧'},
+    {id:2015,name:'Baan Orchid Townhouse Corner',location:'42/16 Villa Marina, Chaweng, Koh Samui',beds:3,baths:2,pool:'yes',rate:'฿53,000/mo',status:'available',owner:'Kimberly Property',ownerContact:'065-995-4449 · WhatsApp/Line: 0813520757',tenant:'',notes:'Corner 2-storey townhouse · Fully renovated Modern Tropical style · 27.3 sqw · 3 bed / 2 bath / 1 parking · Fully furnished & move-in ready · Beko washer+dryer · Smart TV all rooms · Gas stove + hood + full kitchen · All new AC · Communal pool available · Near Bangkok Hospital, PBISS, Chaweng beach, Lotus, Makro · Maps: Villa Marina 42/16 Ko Samui District Surat Thani 84320',emoji:'🏡'},
+    {id:2014,name:'Sea View Land Chaweng 1468sqm',location:'Chaweng, Koh Samui',beds:0,baths:0,pool:'no',rate:'฿350,000/year',status:'available',owner:'Bew Remax',ownerContact:'+66 63 969 3635 · Line: barbqbeauty',tenant:'',notes:'Sea view land · 1,468 sqm (0-3-67 Rai) · Chanote Title Deed · Long-term lease up to 30 years · ฿350,000/year (pay every 3 years in advance = ฿1,050,000 first payment) · 3% rent increase every 3 years · Near: Bangkok Hospital 950m, Road Hill Samui 850m, Chaweng Noi Beach 1.5km, PBISS 2.3km, The Roof 1.6km · REMAX ID: RO079-45 · Ideal: villa, residence, small business.',emoji:'🌊'},
+    {id:2013,name:'Land Plots Chaweng Noi (multi)',location:'Chaweng Noi, Koh Samui',beds:0,baths:0,pool:'no',rate:'POA',status:'available',owner:'Bew Remax',ownerContact:'+66 63 969 3635 · Line: barbqbeauty',tenant:'',notes:'Multiple land plots available in Chaweng Noi area · Various sizes shown in aerial maps: Plot 1 ~54.74x49.35m, Plot 2 irregular ~48.61m, Plot 3 ~71.27x70.54m · Near Villa Luna, Villa Q, Road Hill Samui · Contact Bew for pricing and exact details · REMAX Island Real Estate.',emoji:'🗺️'},
+    {id:2012,name:'2-Storey Shophouse Mae Nam',location:'Mae Nam Soi 6',beds:2,baths:3,pool:'no',rate:'฿18,000-23,000/mo',status:'available',owner:'Natt Juls',ownerContact:'093-1566659 (คุณมด) · 089-6331978 (คุณพัน) · Line: https://line.me/ti/p/74e4-0550s',tenant:'',notes:'2-storey shophouse · Fully furnished · Mae Nam Soi 6 near ring road · Near Mae Nam beach, Crystal Bay (Fisherman Village), Bo Phut · Suitable: office/clinic/beauty shop · Ground floor shop + upper floor office/storage · Min 1-year contract ฿18,000-23,000/mo · Available 10 April 2026 · Accepts Thai & foreign clients.',emoji:'🏬'},
+    {id:2011,name:'Land Nathon 1192sqm',location:'Nathon District',beds:0,baths:0,pool:'no',rate:'฿20,000/mo',status:'available',owner:'Tassanee Phapitak',ownerContact:'DM Facebook (direct owner)',tenant:'',notes:'Large plot 1,192 sqm (292 ตร.วา ~3 งาน) · 5 min from Nathon Pier, Tesco, 7-Eleven, local market · Flat land, no flood risk · Deep well water + electricity ready · Sale ฿2,200,000 or long-term lease 10-20 years ฿20,000/mo · Direct owner, no agent · Coords: 9°32 38.3N 99°56 40.5E',emoji:'🌿'},
+    {id:2010,name:'Land Nathon 1192sqm (v2)',location:'Nathon District',beds:0,baths:0,pool:'no',rate:'฿20,000/mo',status:'available',owner:'Tassanee Phapitak',ownerContact:'DM Facebook (direct owner)',tenant:'',notes:'Same plot · Sale ฿2,000,000 or lease ฿20,000/mo · 292 ตร.วา · Near Nathon pier · Agents welcome (รับนายหน้า)',emoji:'🌾'},
+    {id:2009,name:'Nava Villas Lamai-Maret',location:'Lamai-Maret',beds:3,baths:3,pool:'yes',rate:'From ฿8,900,000',status:'available',owner:'Marie Akara',ownerContact:'+66 65 592 3161',tenant:'',notes:'30-year leasehold · European-standard construction · 2 bed from ฿7.9M · 3 bed from ฿8.9M · 4 bed from ฿9.9M · Private pool each villa · 12% guaranteed ROI · Close to beaches/schools · French & English team · Foreign investor friendly (no company needed).',emoji:'🏖️'},
+    {id:2008,name:'Sea View Land Rent',location:'Koh Samui',beds:0,baths:0,pool:'no',rate:'฿200,000/year',status:'available',owner:'Samui Tree Villa',ownerContact:'WhatsApp 081-415-2534',tenant:'',notes:'Sea view land · 560 SQM total · 6 plots · Long-term rent · Ideal for villa development, rental business, holiday project · Maps: https://maps.app.goo.gl/H83uSBBqKizVrD9o6',emoji:'🌊'},
+    {id:2015,name:'Baan Orchid Townhouse Corner',location:'42/16 Villa Marina, Chaweng, Koh Samui',beds:3,baths:2,pool:'yes',rate:'฿53,000/mo',status:'available',owner:'Kimberly Property',ownerContact:'065-995-4449 · WhatsApp/Line: 0813520757',tenant:'',notes:'Corner 2-storey townhouse · Fully renovated Modern Tropical style · 27.3 sqw · 3 bed / 2 bath / 1 parking · Fully furnished & move-in ready · Beko washer+dryer · Smart TV all rooms · Gas stove + hood + full kitchen · All new AC · Communal pool available · Near Bangkok Hospital, PBISS, Chaweng beach, Lotus, Makro · Maps: Villa Marina 42/16 Ko Samui District Surat Thani 84320',emoji:'🏡'},
+    {id:2014,name:'Sea View Land Chaweng 1468sqm',location:'Chaweng, Koh Samui',beds:0,baths:0,pool:'no',rate:'฿350,000/year',status:'available',owner:'Bew Remax',ownerContact:'+66 63 969 3635 · Line: barbqbeauty',tenant:'',notes:'Sea view land · 1,468 sqm (0-3-67 Rai) · Chanote Title Deed · Long-term lease up to 30 years · ฿350,000/year (pay every 3 years in advance = ฿1,050,000 first payment) · 3% rent increase every 3 years · Near: Bangkok Hospital 950m, Road Hill Samui 850m, Chaweng Noi Beach 1.5km, PBISS 2.3km, The Roof 1.6km · REMAX ID: RO079-45 · Ideal: villa, residence, small business.',emoji:'🌊'},
+    {id:2013,name:'Land Plots Chaweng Noi (multi)',location:'Chaweng Noi, Koh Samui',beds:0,baths:0,pool:'no',rate:'POA',status:'available',owner:'Bew Remax',ownerContact:'+66 63 969 3635 · Line: barbqbeauty',tenant:'',notes:'Multiple land plots available in Chaweng Noi area · Various sizes shown in aerial maps: Plot 1 ~54.74x49.35m, Plot 2 irregular ~48.61m, Plot 3 ~71.27x70.54m · Near Villa Luna, Villa Q, Road Hill Samui · Contact Bew for pricing and exact details · REMAX Island Real Estate.',emoji:'🗺️'},
+    {id:2012,name:'2-Storey Shophouse Mae Nam',location:'Mae Nam Soi 6',beds:2,baths:3,pool:'no',rate:'฿18,000-23,000/mo',status:'available',owner:'Natt Juls',ownerContact:'093-1566659 (คุณมด) · 089-6331978 (คุณพัน) · Line: https://line.me/ti/p/74e4-0550s',tenant:'',notes:'2-storey shophouse · Fully furnished · Mae Nam Soi 6 near ring road · Near Mae Nam beach, Crystal Bay (Fisherman Village), Bo Phut · Suitable: office/clinic/beauty shop · Ground floor shop + upper floor office/storage · Min 1-year contract ฿18,000-23,000/mo · Available 10 April 2026 · Accepts Thai & foreign clients.',emoji:'🏬'},
+    {id:2011,name:'Land Nathon 1192sqm',location:'Nathon District',beds:0,baths:0,pool:'no',rate:'฿20,000/mo',status:'available',owner:'Tassanee Phapitak',ownerContact:'DM Facebook (direct owner)',tenant:'',notes:'Large plot 1,192 sqm (292 ตร.วา ~3 งาน) · 5 min from Nathon Pier, Tesco, 7-Eleven, local market · Flat land, no flood risk · Deep well water + electricity ready · Sale ฿2,200,000 or long-term lease 10-20 years ฿20,000/mo · Direct owner, no agent · Coords: 9°32 38.3N 99°56 40.5E',emoji:'🌿'},
+    {id:2010,name:'Land Nathon 1192sqm (v2)',location:'Nathon District',beds:0,baths:0,pool:'no',rate:'฿20,000/mo',status:'available',owner:'Tassanee Phapitak',ownerContact:'DM Facebook (direct owner)',tenant:'',notes:'Same plot · Sale ฿2,000,000 or lease ฿20,000/mo · 292 ตร.วา · Near Nathon pier · Agents welcome (รับนายหน้า)',emoji:'🌾'},
+    {id:2009,name:'Nava Villas Lamai-Maret',location:'Lamai-Maret',beds:3,baths:3,pool:'yes',rate:'From ฿8,900,000',status:'available',owner:'Marie Akara',ownerContact:'+66 65 592 3161',tenant:'',notes:'30-year leasehold · European-standard construction · 12% guaranteed ROI · Options: 2-bed ฿7.9M, 3-bed ฿8.9M, 4-bed ฿9.9M · Private pool each villa · Near beaches, shops, international schools · French & English speaking team · Foreign investor friendly (no company needed).',emoji:'🏘️'},
+    {id:2008,name:'Sea View Land Samui',location:'Koh Samui',beds:0,baths:0,pool:'no',rate:'฿200,000/year',status:'available',owner:'Samui Tree Villa',ownerContact:'WhatsApp 081-415-2534',tenant:'',notes:'Sea view land · 560 SQM · 6 plots · Long-term rent ฿200,000/year · Ideal for villa development, rental business, holiday project · Maps: https://maps.app.goo.gl/H83uSBBqKizVrD9o6',emoji:'🌊'},
     {id:2007,name:'3-Storey Building Thaledi',location:'Thaledi (Near Airport)',beds:4,baths:3,pool:'no',rate:'฿30,000/mo',status:'available',owner:'Thapanakorn Koch',ownerContact:'Line: attract168',tenant:'',notes:'3-storey commercial building · 3 units total · 4 new AC units · Land 20 ตร.วา (~80 sqm) · Open ground floor multi-use · On main Thaledi road · Near Samui Airport · Min 6-month contract · Sale price ฿4,500,000 · Good for investment/rental income.',emoji:'🏢'},
     {id:2006,name:'Chaweng Noi Mountain View House',location:'Chaweng Noi',beds:1,baths:1,pool:'no',rate:'฿15,000/mo',status:'available',owner:'Aom Sangsuriya',ownerContact:'WhatsApp +66689994721',tenant:'',notes:'Mountain view, near PBISS school. Short-term <1yr: ฿17,000/mo. Long-term 1yr+: ฿15,000/mo. Deposit: ฿10,000. Electric ฿8/unit, Water ฿200/person/month, Exit cleaning ฿700. No pets. Available NOW.',emoji:'⛰️'},
   ];
@@ -1072,26 +1086,28 @@ function renderTanks(){
   if(!tanks.length){ g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted);">No projects yet. Add your first tank project.</div>'; return; }
   const statusLabel = {concept:'💡 Concept',planning:'📋 Planning',active:'🚀 Active',hold:'⏸ Hold',done:'✅ Done'};
   const statusCls   = {concept:'tsb-concept',planning:'tsb-planning',active:'tsb-active',hold:'tsb-hold',done:'tsb-done'};
-  g.innerHTML = tanks.map(t => {
+  g.innerHTML = tanks.map(function(t) {
     const miles = (t.milestones||'').split('\n').filter(Boolean);
-    return \`<div class="tank-card \${t.status||'concept'}">
-      <div class="tank-card-top">
-        <div class="tank-name">\${esc(t.name)}</div>
-        <span class="tank-status-badge \${statusCls[t.status]||'tsb-concept'}">\${statusLabel[t.status]||t.status}</span>
-      </div>
-      <div class="tank-cat">🏷 \${esc(t.cat||'General')} \${t.location?'· 📍'+esc(t.location):''}</div>
-      \${t.vision?'<div class="tank-vision">'+esc(t.vision).substring(0,160)+(t.vision.length>160?'…':'')+'</div>':''}
-      <div class="tank-stats">
-        <div class="tstat"><div class="tstat-label">Target Revenue</div><div class="tstat-val">\${esc(t.revenue||'—')}</div></div>
-        <div class="tstat"><div class="tstat-label">Added</div><div class="tstat-val">\${t.created||'—'}</div></div>
-      </div>
-      \${miles.length?'<div class="tank-milestones"><div class="tm-label">Roadmap</div>'+miles.map(m=>'<div class="tm-item">→ '+esc(m)+'</div>').join('')+'</div>':''}
-      <div class="tank-actions">
-        <div class="tank-btn" onclick="openTankModal(\${t.id})">✏️ Edit</div>
-        \${t.notebook?'<a class="tank-btn nb" href="'+esc(t.notebook)+'" target="_blank">📓 NotebookLM</a>':''}
-        <div class="tank-btn del" onclick="deleteTank(\${t.id})">✕</div>
-      </div>
-    </div>\`;
+    const milesHtml = miles.length ? '<div class="tank-milestones"><div class="tm-label">Roadmap</div>'+miles.map(function(m){return '<div class="tm-item">→ '+esc(m)+'</div>';}).join('')+'</div>' : '';
+    const nbBtn = t.notebook ? '<a class="tank-btn nb" href="'+esc(t.notebook)+'" target="_blank">📓 NotebookLM</a>' : '';
+    return '<div class="tank-card '+( t.status||'concept')+'">'+
+      '<div class="tank-card-top">'+
+        '<div class="tank-name">'+esc(t.name)+'</div>'+
+        '<span class="tank-status-badge '+(statusCls[t.status]||'tsb-concept')+'">'+(statusLabel[t.status]||t.status)+'</span>'+
+      '</div>'+
+      '<div class="tank-cat">🏷 '+esc(t.cat||'General')+(t.location?' · 📍'+esc(t.location):'')+'</div>'+
+      (t.vision?'<div class="tank-vision">'+esc(t.vision).substring(0,160)+(t.vision.length>160?'…':'')+'</div>':'')+
+      '<div class="tank-stats">'+
+        '<div class="tstat"><div class="tstat-label">Target Revenue</div><div class="tstat-val">'+esc(t.revenue||'—')+'</div></div>'+
+        '<div class="tstat"><div class="tstat-label">Added</div><div class="tstat-val">'+(t.created||'—')+'</div></div>'+
+      '</div>'+
+      milesHtml+
+      '<div class="tank-actions">'+
+        '<div class="tank-btn" onclick="openTankModal('+t.id+')">✏️ Edit</div>'+
+        nbBtn+
+        '<div class="tank-btn del" onclick="deleteTank('+t.id+')">✕</div>'+
+      '</div>'+
+    '</div>';
   }).join('');
 }
 
@@ -1166,7 +1182,6 @@ if(!kdeals) {
   ];
   saveKDeals();
 }
-
 function saveKDeals(){ localStorage.setItem('samui_pm_kdeals', JSON.stringify(kdeals)); }
 
 let draggingId = null, editingKCardId = null;
